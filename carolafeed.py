@@ -2,11 +2,11 @@
 import sys, os
 import requests
 import re
-#pin install bs4
+#pip install bs4
 from bs4 import BeautifulSoup
-#pin install feedparser
+#pip install feedparser
 import feedparser
-#pin install readability-lxml
+#pip install readability-lxml
 from readability.readability import Document
 
 from lxml import etree as ET
