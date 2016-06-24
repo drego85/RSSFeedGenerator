@@ -33,6 +33,6 @@ Special thanks:
 
 ### Requirements
 - Python
-- bs4 (pin install bs4)
+- bs4 (pip install bs4)
 - feedparser (pip install feedparser)
 - readability-lxml (pip install readability-lxml)
