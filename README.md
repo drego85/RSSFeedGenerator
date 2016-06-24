@@ -13,7 +13,7 @@ Nonostante la nostra amicizia su Facebook e Twitter a volte perdo per strada i s
 3. Se il tag corrisponde con "carola frediani" o "frediani carola" viene aggiornato il Feed RSS in XML;
 4. Il Feed RSS dedicato a Carola conterrà, come da standard, l'ultimo articolo in cima. Vengono inoltre rimossi eventuali duplicati;
 5. Il Feed conterrà il Titolo, Link, Data (approssimativa) e Contenuto dell'articolo;
-6. Il contenuto viene reso "leggibile" con le dedicate librerire di Python (readability.com sulla La Stampa non funziona) e nel feed vengono riportati i soli primi 400 caratteri (HTML compreso, ovvero poco più di 100 caratteri di testo puro). Volutamente, per continuare la lettura si dovrà accedere al sito originale.
+6. Il contenuto viene reso "leggibile" con le dedicate librerire di Python e nel feed vengono riportati i soli primi 400 caratteri (HTML compreso, ovvero poco più di 100 caratteri di testo puro). Volutamente, per continuare la lettura si dovrà accedere al sito originale.
 
 ###Feed RSS:
 
