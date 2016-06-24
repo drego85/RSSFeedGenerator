@@ -29,8 +29,10 @@ GNU General Public License version 2.0 (GPLv2)
 
 Special thanks:
 
-* [Padraic Cunningham](http://stackexchange.com/users/2456564/padraic-cunningham?tab=accounts) to support for coding;
+* [Padraic Cunningham](http://stackexchange.com/users/2456564/padraic-cunningham?tab=accounts) to support for coding.
 
-
- 
-
+### Requirements
+- Python
+- bs4 (pin install bs4)
+- feedparser (pip install feedparser)
+- readability-lxml (pip install readability-lxml)
