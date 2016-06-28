@@ -74,7 +74,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 	description.text = descriptionfeed[0:400]
 	
 	pubDate = ET.SubElement(item, "pubDate")
-	pubDate.text = strftime("%a, %d %b %Y +0000", gmtime())
+	pubDate.text = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
 	
 	channel.find(".//generator").addnext(item)
 	#print ET.tostring(channel, pretty_print=True, xml_declaration=True)
@@ -108,5 +108,3 @@ def main(argv):
 			
 if __name__ == "__main__":
 	main(sys.argv[1:])
-
-
