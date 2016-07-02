@@ -19,23 +19,13 @@ timeoutconnection = 10
 rssfile = "carolafeed.xml"
 
 
-def get_html(url):
-    try:
-        pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-        soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-        return str(soupdesktop)
-    except:
-        return ""
-        pass
-
-
 def check_carola(url):
     try:
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
         soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-        test = soupdesktop.find("div", attrs={"style": "float:left"})
-        if ("carola frediani" in str(test.contents)) or ("frediani carola" in str(test.contents)):
-            return True
+        autore = soupdesktop.find("div", attrs={"style": "float:left"})
+        if ("carola frediani" in str(autore.contents)) or ("frediani carola" in str(autore.contents)):
+            return str(soupdesktop)
     except:
         return ""
         pass
@@ -107,10 +97,10 @@ def main(argv):
     for post in feed.entries:
 
         url = post.link
+        htmlscrap = check_carola(url)
 
-        if check_carola(url):
+        if htmlscrap:
             print "Trovato articolo: " + url
-            htmlscrap = get_html(url)
             description = Document(htmlscrap).summary()
             title = Document(htmlscrap).short_title()
             add_feed(title, description, post.link)
