@@ -17,6 +17,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
                  "Accept-Language": "it"}
 timeoutconnection = 10
 rssfile = "carolafeed.xml"
+urlarticoliarray = []
 
 
 def check_carola(url):
@@ -27,7 +28,6 @@ def check_carola(url):
         if ("carola frediani" in str(autore.contents)) or ("frediani carola" in str(autore.contents)):
             return str(soupdesktop)
     except:
-        return ""
         pass
 
 
@@ -86,24 +86,49 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree.write(rssfile, pretty_print=True, xml_declaration=True)
 
 
-def main(argv):
-    rss_url = "http://www.lastampa.it/rss.xml"
-    feed = feedparser.parse(rss_url)
+def scrap_home(url):
+    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    # Se non esiste un file XML procedo a crearlo.
+    for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
+        for link in div.find_all("a", href=True):
+            if link["href"].startswith(strftime("/%Y/%m")):
+                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+
+
+def scrap_rss(url):
+    feed = feedparser.parse(url)
+    for post in feed.entries:
+        urlarticoliarray.append(post.link)
+
+
+def main(argv):
+    home_url = "http://www.lastampa.it"
+    rss_url = "http://www.lastampa.it/rss.xml"
+
+    # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
+    scrap_rss(rss_url)
+
+    # Acquisisco tutti gli URL degli articoli pubblicati in home, poiche il Feed RSS non contiene tutti gli articoli
+    # pubblicati online ma solo i piu rilevanti
+    scrap_home(home_url)
+
+    # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
         make_feed()
 
-    for post in feed.entries:
-
-        url = post.link
-        htmlscrap = check_carola(url)
+    # Analizzo ogni singolo articolo rilevato
+    for urlarticolo in urlarticoliarray:
+        
+        # Se l articolo appariene a carola la funzione check_carola mi restituisce il codice HTML della pagina che
+        # sara utile per estrarre il titolo dell articolo e il relativo contenuto
+        htmlscrap = check_carola(urlarticolo)
 
         if htmlscrap:
-            print "Trovato articolo: " + url
-            description = Document(htmlscrap).summary()
+            print "Trovato articolo: " + urlarticolo
             title = Document(htmlscrap).short_title()
-            add_feed(title, description, post.link)
+            description = Document(htmlscrap).summary()
+            add_feed(title, description, urlarticolo)
 
 
 if __name__ == "__main__":
