@@ -29,7 +29,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
 
 timeoutconnection = 120
 
-rssfile = outputpath + "carolafeed.xml"
+rssfile = Config.outputpath + "carolafeed.xml"
 
 
 def make_feed():
