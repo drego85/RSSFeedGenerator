@@ -31,7 +31,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
                  "Accept-Language": "it"}
 
 timeoutconnection = 120
-rssfile = "carolafeed.xml"
+rssfile = outputpath + "carolafeed.xml"
 urlarticoliarray = []
 
 
