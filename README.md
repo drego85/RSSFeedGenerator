@@ -1,12 +1,12 @@
-#Carola Frediani Feed RSS
+# RSS Feed Generator
 
 ###Perchè nasce questo progetto:
 
-Il quotidiano La Stampa non permette di ricevere notifiche di nuove pubblicazioni o di effettuare ricerche su un singolo autore, limitando pertanto la possibilità di rimanere aggiornati sugli ottimi articoli scritti da Carola.
+Il progetto nasce con l'itento di creare un Feed RSS di ogni articolo scritto da Carola Frediani, poichè il quotidiano La Stampa non permette di ricevere notifiche di nuove pubblicazioni o di effettuare ricerche su un singolo autore, limitando pertanto la possibilità di rimanere aggiornati sugli ottimi articoli scritti da Carola.
 
-Nonostante la nostra amicizia su Facebook e Twitter a volte perdo per strada i suoi ottimi articoli, sono da sempre un fondato sostenitore dei Feed RSS pertanto ho pensato di realizzare questo semplice progetto Open Source. Per chi fosse interessato al codice lo trova su GitHub.
+Successivamente il progetto si è amplicato creando generatori di Feed RSS anche per altri fonti che non prevedono automaticamente la geneazione di un Feed.
 
-###Come funziona:
+## Funzionamento Feed Carola Frediani
 
 1. È presente un cron che ogni 30 minuti analizza il Feed RSS e Homepage della La Stampa;
 2. Per ogni articolo pubblicato fa uno scrap del codice HTML alla ricerca del tag "article-author";
@@ -17,7 +17,7 @@ Nonostante la nostra amicizia su Facebook e Twitter a volte perdo per strada i s
 
 ###Feed RSS:
 
-Il Feed RSS è disponibile al seguente URL: https://carola.draghetti.it/carolafeed.xml
+I Feed RSS generati sono disponibi su: https://rss.draghetti.it/
 
 ###License
 
@@ -35,4 +35,3 @@ Special thanks:
 - Python
 - bs4 (pip install bs4)
 - feedparser (pip install feedparser)
-- readability-lxml (pip install readability-lxml)

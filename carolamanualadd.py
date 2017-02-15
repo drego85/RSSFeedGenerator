@@ -20,32 +20,16 @@ import os
 import json
 import Config
 import requests
-import feedparser
 from lxml import etree as ET
-from bs4 import BeautifulSoup
 from time import gmtime, strftime
-
 
 # User Agent MSIE 11.0 (Win 10)
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
                  "Accept-Language": "it"}
 
 timeoutconnection = 120
+
 rssfile = "carolafeed.xml"
-urlarticoliarray = []
-
-
-def check_carola(url):
-    try:
-        pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-        soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-        autore = soupdesktop.find("div", attrs={"style": "float:left"})
-        if ("carola frediani" in str(autore.contents)) or ("frediani carola" in str(autore.contents)):
-            return True
-        else:
-            return False
-    except:
-        pass
 
 
 def make_feed():
@@ -98,25 +82,9 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     pubDate.text = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
 
     channel.find(".//generator").addnext(item)
-
     tree = ET.ElementTree(channel)
+
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
-
-
-def scrap_home(url):
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-
-    for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
-        for link in div.find_all("a", href=True):
-            if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
-
-
-def scrap_rss(url):
-    feed = feedparser.parse(url)
-    for post in feed.entries:
-        urlarticoliarray.append(post.link)
 
 
 def mercuryparser(url):
@@ -128,30 +96,16 @@ def mercuryparser(url):
 
     return data["title"], data["content"]
 
+
 def main():
-    home_url = "http://www.lastampa.it"
-    rss_url = "http://www.lastampa.it/rss.xml"
+    urlarticolo = "http://www.lastampa.it/2017/02/10/tecnologia/news/ecco-la-app-per-scoprire-se-la-tua-connessione-censurata-o-rallentata-p66YhNjnq1mdDZQum7lfgM/pagina.html"
 
-    # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
-    scrap_rss(rss_url)
-
-    # Acquisisco tutti gli URL degli articoli pubblicati in home, poiche il Feed RSS non contiene tutti gli articoli
-    # pubblicati online ma solo i piu rilevanti
-    scrap_home(home_url)
-
-    # Se non esiste localmente un file XML procedo a crearlo.
+    # Se non esiste il feed XML lo creo
     if os.path.exists(rssfile) is not True:
         make_feed()
 
-    # Analizzo ogni singolo articolo rilevato
-    for urlarticolo in urlarticoliarray:
-
-        # Verifico se l articolo e stato scritto da Carola in caso affermativo effeutto il Parser del testo e creo il Feed
-        if check_carola(urlarticolo):
-            print "Trovato articolo: " + urlarticolo
-
-            title, description = mercuryparser(urlarticolo)
-            add_feed(title, description, urlarticolo)
+    title, description = mercuryparser(urlarticolo)
+    add_feed(title, description, urlarticolo)
 
 
 if __name__ == "__main__":
