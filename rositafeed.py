@@ -98,7 +98,6 @@ def scrap_repubblica(url):
         for article in div.find_all("article"):
             for h1 in article.find_all("h1"):
                 for link in h1.find_all("a", href=True):
-                    print link["href"]
                     urlarticoliarray.append(link["href"].replace("?ref=search", ""))
 
 
