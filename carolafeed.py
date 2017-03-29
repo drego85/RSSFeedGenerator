@@ -25,7 +25,6 @@ from lxml import etree as ET
 from bs4 import BeautifulSoup
 from time import gmtime, strftime
 
-
 # User Agent MSIE 11.0 (Win 10)
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
                  "Accept-Language": "it"}
@@ -112,6 +111,11 @@ def scrap_home(url):
             if link["href"].startswith(strftime("/%Y/%m")):
                 urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
 
+    for div in soupdesktop.find_all("h1", attrs={"class": "article-title"}):
+        for link in div.find_all("a", href=True):
+            if link["href"].startswith(strftime("/%Y/%m")):
+                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+
 
 def scrap_rss(url):
     feed = feedparser.parse(url)
@@ -127,6 +131,7 @@ def mercuryparser(url):
     data = json.loads(page.text)
 
     return data["title"], data["content"]
+
 
 def main():
     home_url = "http://www.lastampa.it"
