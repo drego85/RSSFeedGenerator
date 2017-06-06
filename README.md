@@ -15,15 +15,15 @@ Successivamente il progetto si è amplicato creando generatori di Feed RSS anche
 5. Il Feed conterrà il Titolo, Link, Data (approssimativa) e Contenuto dell'articolo;
 6. Il contenuto viene reso "leggibile" con la libreria Readability e nel feed vengono riportati i soli primi 400 caratteri (HTML compreso, ovvero poco più di 100 caratteri di testo puro). Volutamente, per continuare la lettura si dovrà accedere al sito originale.
 
-###Feed RSS:
+### Feed RSS:
 
 I Feed RSS generati sono disponibi su: https://rss.draghetti.it/
 
-###License
+### License
 
 GNU General Public License version 2.0 (GPLv2)
 
-###Credits
+### Credits
 
 * [Andrea Draghetti](https://twitter.com/AndreaDraghetti) is the creator of the project
 
