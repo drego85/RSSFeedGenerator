@@ -3,3 +3,4 @@
 .idea/
 Config.py
 leak.py
+*.xml
