@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python2
+# -*- coding: utf-8 -*-
 # This file is part of RSS Generator Feed.
 #
 # Copyright(c) 2017 Andrea Draghetti
@@ -16,7 +17,7 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-# -*- coding: utf-8 -*-
+
 import os
 import re
 import json
@@ -24,7 +25,9 @@ import Config
 import requests
 import feedparser
 from lxml import etree as ET
+from bs4 import BeautifulSoup
 from time import gmtime, strftime
+from readability.readability import Document
 
 # User Agent MSIE 11.0 (Win 10)
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
@@ -99,13 +102,20 @@ def scrap_rss(url):
 
 
 def mercuryparser(url):
-    mercury = "https://mercury.postlight.com/parser?url="
+    mercuryurl = "https://mercury.postlight.com/parser?url=%s" % url
 
-    page = requests.get(mercury + url, headers=Config.headermercury, timeout=timeoutconnection)
+    page = requests.get(mercuryurl, headers=Config.headermercury, timeout=timeoutconnection)
     page.encoding = "UTF-8"
     data = json.loads(page.text)
 
-    return data["title"], data["content"]
+    if data:
+        return data["title"], data["content"]
+    else:
+        response = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+        soup = BeautifulSoup(response.text, "html.parser")
+        title = Document(str(soup)).short_title()
+        description = Document(str(soup)).summary()
+        return title, description
 
 
 def main():
