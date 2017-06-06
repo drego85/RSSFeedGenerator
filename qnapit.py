@@ -92,8 +92,9 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 def scrap_rss(url):
     feed = feedparser.parse(url)
     for post in feed.entries:
-        url = re.findall('<a href="?\'?([^"\'>]*)', post.summary)
+        url = re.findall('<a href="([^"\>]*)', post.summary)
         if url:
+            print url
             urlarticoliarray.append(url[0])
 
 
