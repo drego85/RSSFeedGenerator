@@ -16,6 +16,7 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# -*- coding: utf-8 -*-
 import os
 import re
 import json
@@ -94,7 +95,6 @@ def scrap_rss(url):
     for post in feed.entries:
         url = re.findall('<a href="([^"\>]*)', post.summary)
         if url:
-            print url
             urlarticoliarray.append(url[0])
 
 
