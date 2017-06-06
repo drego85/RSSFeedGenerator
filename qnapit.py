@@ -130,7 +130,7 @@ def main():
 
     # Analizzo ogni singolo articolo rilevato
     for urlarticolo in urlarticoliarray:
-        print "Trovato articolo: " + urlarticolo
+        #print "Trovato articolo: " + urlarticolo
 
         title, description = mercuryparser(urlarticolo)
         add_feed(title, description, urlarticolo)
