@@ -57,7 +57,7 @@ def make_feed():
     title.text = "Carola Frediani RSS Feed"
 
     link = ET.SubElement(channel, "link")
-    link.text = "http://rss.draghetti.it"
+    link.text = "https://rss.draghetti.it"
 
     description = ET.SubElement(channel, "description")
     description.text = "Feed RSS di tutti gli articoli scritti da Carola Frediani per La Stampa"
