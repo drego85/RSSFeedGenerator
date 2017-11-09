@@ -43,6 +43,7 @@ def check_carola(url):
             return True
         else:
             return False
+
     except:
         pass
 
@@ -91,7 +92,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     link.text = linkfeed
 
     description = ET.SubElement(item, "description")
-    description.text = descriptionfeed[0:500]
+    description.text = descriptionfeed
 
     pubDate = ET.SubElement(item, "pubDate")
     pubDate.text = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
