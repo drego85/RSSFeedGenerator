@@ -141,10 +141,6 @@ def main():
 
         for idx, row in enumerate(table.findAll("tr", onclick=True)):
 
-            # Se sto analizzando la prima riga della tabella (ovvero quella con i titoli) salto e proseguo
-            if idx == 0:
-                continue
-
             cells = row.findAll("td")
             title = cells[2].find(text=True).encode("ascii", "ignore") + " - " + cells[1].find(text=True).encode(
                 "ascii", "ignore")
