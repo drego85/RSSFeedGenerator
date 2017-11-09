@@ -180,11 +180,11 @@ def main():
                         description = description + str(row)
 
                     try:
-                        description = description.replace("src=\"", "src=\"https://www.calendariopodismo.it/")
+                        description = description.replace("src=\"", "align=\"center\" src=\"https://www.calendariopodismo.it/")
                     except:
                         pass
 
-                description = "<table>" + description + "</table>"
+                description = "<table align=\"center\">" + description + "</table>"
 
                 description = description.decode("ascii", "ignore")
 
