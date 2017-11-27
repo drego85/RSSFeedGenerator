@@ -77,7 +77,7 @@ def add_feed(titlefeed, linkfeed):
     description = ET.SubElement(item, "description")
     description.text = titlefeed
 
-    enclosure = ET.SubElement(item, "description")
+    enclosure = ET.SubElement(item, "enclosure")
     enclosure.set("url", linkfeed)
     enclosure.set("type", "audio/mpeg")
 
