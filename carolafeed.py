@@ -111,12 +111,12 @@ def scrap_home(url):
     for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("https://www.lastampa.it%s" % link["href"])
+                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
 
     for div in soupdesktop.find_all("h1", attrs={"class": "article-title"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("https://www.lastampa.it%s" % link["href"])
+                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
 
 
 def scrap_rss(url):
@@ -151,8 +151,8 @@ def mercuryparser(url):
 
 
 def main():
-    home_url = "https://www.lastampa.it"
-    rss_url = "https://www.lastampa.it/rss.xml"
+    home_url = "http://www.lastampa.it"
+    rss_url = "http://www.lastampa.it/rss.xml"
 
     # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
     scrap_rss(rss_url)
