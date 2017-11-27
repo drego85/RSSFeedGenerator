@@ -39,7 +39,8 @@ def check_carola(url):
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
         soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
         autore = soupdesktop.find("div", attrs={"style": "float:left"})
-        if ("carola frediani" in str(autore.contents)) or ("frediani carola" in str(autore.contents)):
+
+        if ("carola frediani" in str(autore.contents).lower()) or ("frediani carola" in str(autore.contents).lower()):
             return True
         else:
             return False
@@ -110,12 +111,12 @@ def scrap_home(url):
     for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+                urlarticoliarray.append("https://www.lastampa.it%s" % link["href"])
 
     for div in soupdesktop.find_all("h1", attrs={"class": "article-title"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+                urlarticoliarray.append("https://www.lastampa.it%s" % link["href"])
 
 
 def scrap_rss(url):
@@ -125,18 +126,33 @@ def scrap_rss(url):
 
 
 def mercuryparser(url):
-    mercury = "https://mercury.postlight.com/parser?url="
+    try:
+        mercury = "https://mercury.postlight.com/parser?url="
 
-    page = requests.get(mercury + url, headers=Config.headermercury, timeout=timeoutconnection)
-    page.encoding = "UTF-8"
-    data = json.loads(page.text)
+        page = requests.get(mercury + url, headers=Config.headermercury, timeout=timeoutconnection)
+        page.encoding = "UTF-8"
+        data = json.loads(page.text)
 
-    return data["title"], data["content"]
+        if data:
+
+            return data["title"], data["content"]
+
+        else:
+
+            response = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+            soup = BeautifulSoup(response.text, "html.parser")
+            title = soup.title.string
+            description = "Impossibile recuperare il contenuto dell'articolo."
+
+            return title, description
+
+    except:
+        pass
 
 
 def main():
-    home_url = "http://www.lastampa.it"
-    rss_url = "http://www.lastampa.it/rss.xml"
+    home_url = "https://www.lastampa.it"
+    rss_url = "https://www.lastampa.it/rss.xml"
 
     # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
     scrap_rss(rss_url)
