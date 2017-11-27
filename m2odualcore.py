@@ -52,16 +52,19 @@ def make_feed():
     generator = ET.SubElement(channel, "generator")
     generator.text = "M2O Dual Core Podcast by Andrea Draghetti"
 
+    enclosure = ET.SubElement(channel, "itunes:image")
+    enclosure.set("href", "https://upload.wikimedia.org/wikipedia/commons/a/ae/Logo-m2o-plain-nero.jpg")
+
     tree = ET.ElementTree(root)
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def add_feed(titlefeed, linkfeed):
+def add_feed(titlefeed, linkmp3):
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.parse(rssfile, parser)
     channel = tree.getroot()
 
-    # Escludo eventuali duplicati in base al link
+    # Escludo eventuali duplicati in base al link del mp3
     for i in channel.findall(".//link"):
         if (i.text == linkfeed):
             return
@@ -72,13 +75,13 @@ def add_feed(titlefeed, linkfeed):
     title.text = titlefeed
 
     link = ET.SubElement(item, "link")
-    link.text = linkfeed
+    link.text = "https://www.m2o.it/programmi/dual-core/puntate/"
 
     description = ET.SubElement(item, "description")
     description.text = titlefeed
 
     enclosure = ET.SubElement(item, "enclosure")
-    enclosure.set("url", linkfeed)
+    enclosure.set("url", linkmp3)
     enclosure.set("type", "audio/mpeg")
 
     pubDate = ET.SubElement(item, "pubDate")
