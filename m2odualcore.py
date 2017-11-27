@@ -62,8 +62,8 @@ def add_feed(titlefeed, linkmp3):
     channel = tree.getroot()
 
     # Escludo eventuali duplicati in base al link del mp3
-    for i in channel.findall(".//link"):
-        if (i.text == linkmp3):
+    for i in channel.findall(".//enclosure"):
+        if (i.attrib["url"] == linkmp3):
             return
 
     item = ET.SubElement(channel, "item")
