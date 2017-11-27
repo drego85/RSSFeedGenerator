@@ -52,9 +52,6 @@ def make_feed():
     generator = ET.SubElement(channel, "generator")
     generator.text = "M2O Dual Core Podcast by Andrea Draghetti"
 
-    enclosure = ET.SubElement(channel, "itunes:image")
-    enclosure.set("href", "https://upload.wikimedia.org/wikipedia/commons/a/ae/Logo-m2o-plain-nero.jpg")
-
     tree = ET.ElementTree(root)
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
@@ -66,7 +63,7 @@ def add_feed(titlefeed, linkmp3):
 
     # Escludo eventuali duplicati in base al link del mp3
     for i in channel.findall(".//link"):
-        if (i.text == linkfeed):
+        if (i.text == linkmp3):
             return
 
     item = ET.SubElement(channel, "item")
