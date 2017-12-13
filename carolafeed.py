@@ -38,7 +38,7 @@ def check_carola(url):
     try:
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
         soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-        autore = soupdesktop.find("div", attrs={"style": "float:left"})
+        autore = soupdesktop.find("span", attrs={"class": "author author14 fLeft"})
 
         if ("carola frediani" in str(autore.contents).lower()) or ("frediani carola" in str(autore.contents).lower()):
             return True
@@ -168,7 +168,11 @@ def main():
     # Analizzo ogni singolo articolo rilevato
     for urlarticolo in urlarticoliarray:
 
-        # Verifico se l articolo e stato scritto da Carola in caso affermativo effeutto il Parser del testo e creo il Feed
+        # LaStampa fornice anche la versione AMP di ogni articolo, analizzo questa versione poiche riduce gli errori
+        # del parsing del testo tramite mercury
+        urlarticolo = urlarticolo.replace("/pagina.html", "/amphtml/pagina.amp.html")
+
+        # Verifico se l articolo e stato scritto da Carola in caso affermativo analizzo l'articolo e lo aggiungo al Feed
         if check_carola(urlarticolo):
             print "Trovato articolo: " + urlarticolo
 
