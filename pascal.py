@@ -85,6 +85,8 @@ def load_puntate(url):
 
             if risorsaaudiob64 not in risorseaudioarray:
 
+                print "Rilevata nuova puntata: " + risorsaaudio
+
                 # Ottengo l'URL del MP3
                 response = requests.post(risorsaaudio, headers=headerdesktop, timeout=timeoutconnection)
 
