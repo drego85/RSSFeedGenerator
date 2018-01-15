@@ -98,7 +98,13 @@ def scrap_repubblica(url):
         for article in div.find_all("article"):
             for h1 in article.find_all("h1"):
                 for link in h1.find_all("a", href=True):
-                    urlarticoliarray.append(link["href"].replace("?ref=search", ""))
+
+                    linkdef = link["href"].replace("?ref=search", "")
+
+                    if not linkdef.startswith("http://"):
+                        urlarticoliarray.append("http://" + linkdef)
+                    else:
+                        urlarticoliarray.append(linkdef)
 
 
 
