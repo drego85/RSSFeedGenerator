@@ -102,7 +102,7 @@ def scrap_repubblica(url):
                     linkdef = link["href"].replace("?ref=search", "")
 
                     if not linkdef.startswith("http://"):
-                        urlarticoliarray.append("http://" + linkdef)
+                        urlarticoliarray.append("http:" + linkdef)
                     else:
                         urlarticoliarray.append(linkdef)
 
