@@ -35,16 +35,16 @@ urlarticoliarray = []
 
 
 def check_carola(url):
+    print url
     try:
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-        soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
+        soup = BeautifulSoup(pagedesktop.text, "html.parser")
 
-        autore = soupdesktop.find("span", attrs={"class": "author author14 fLeft"})
-        autorenew = soupdesktop.find("div", attrs={"style": "float:left"})
+        autore = soup.find("span", attrs={"class": "author author14 fLeft"})
+        autore = str(autore.text).lower()
+        autore = autore.split(" ")
 
-        if ("carola frediani" in str(autore.contents).lower() or "frediani carola" in str(
-                autorenew.contents).lower() or "frediani carola" in str(
-                autore.contents).lower() or "frediani carola" in str(autorenew.contents).lower()):
+        if ("carola" in autore and "frediani" in autore):
             return True
         else:
             return False
