@@ -38,9 +38,13 @@ def check_carola(url):
     try:
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
         soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-        autore = soupdesktop.find("span", attrs={"class": "author author14 fLeft"})
 
-        if ("carola frediani" in str(autore.contents).lower()) or ("frediani carola" in str(autore.contents).lower()):
+        autore = soupdesktop.find("span", attrs={"class": "author author14 fLeft"})
+        autorenew = soupdesktop.find("div", attrs={"style": "float:left"})
+
+        if ("carola frediani" in str(autore.contents).lower() or "frediani carola" in str(
+                autorenew.contents).lower() or "frediani carola" in str(
+                autore.contents).lower() or "frediani carola" in str(autorenew.contents).lower()):
             return True
         else:
             return False
