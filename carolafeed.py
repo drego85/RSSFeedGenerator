@@ -35,7 +35,6 @@ urlarticoliarray = []
 
 
 def check_carola(url):
-    print url
     try:
         pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
         soup = BeautifulSoup(pagedesktop.text, "html.parser")
