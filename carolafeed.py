@@ -31,7 +31,8 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "carolafeed.xml"
-urlarticoliarray = []
+urlarticolilastampaarray = []
+urlarticolilagiarray = []
 
 
 def check_carola(url):
@@ -107,25 +108,41 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def scrap_home(url):
+def scrap_lastampa_home(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+                urlarticolilastampaarray.append("http://www.lastampa.it%s" % link["href"])
 
     for div in soupdesktop.find_all("h1", attrs={"class": "article-title"}):
         for link in div.find_all("a", href=True):
             if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticoliarray.append("http://www.lastampa.it%s" % link["href"])
+                urlarticolilastampaarray.append("http://www.lastampa.it%s" % link["href"])
 
 
-def scrap_rss(url):
+def scrap_lastampa_rss(url):
     feed = feedparser.parse(url)
     for post in feed.entries:
-        urlarticoliarray.append(post.link)
+        urlarticolilastampaarray.append(post.link)
+
+
+def scrap_agi(url):
+    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
+
+    for div in soupdesktop.find_all("div", attrs={"class": "js-box5 box5__article-container"}):
+
+        for author in div.find_all("b", attrs={"class": "box5__authorname"}):
+
+            autore = str(author.text.strip()).lower()
+            autore = autore.split(" ")
+
+            if ("carola" in autore and "frediani" in autore):
+                for link in div.find_all("a", attrs={"class": "box5__link"}, href=True):
+                    urlarticolilagiarray.append(link["href"])
 
 
 def mercuryparser(url):
@@ -154,22 +171,26 @@ def mercuryparser(url):
 
 
 def main():
-    home_url = "http://www.lastampa.it"
-    rss_url = "http://www.lastampa.it/rss.xml"
+    lastampa_home_url = "http://www.lastampa.it"
+    lastampa_rss_url = "http://www.lastampa.it/rss.xml"
+    agi_search_url = "https://www.agi.it/search/?keyword=frediani&sortField=pubdate"
 
     # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
-    scrap_rss(rss_url)
+    scrap_lastampa_rss(lastampa_rss_url)
 
     # Acquisisco tutti gli URL degli articoli pubblicati in home, poiche il Feed RSS non contiene tutti gli articoli
     # pubblicati online ma solo i piu rilevanti
-    scrap_home(home_url)
+    scrap_lastampa_home(lastampa_home_url)
+
+    # Acquisisco gli URL degli articoli su AGI
+    scrap_agi(agi_search_url)
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
         make_feed()
 
-    # Analizzo ogni singolo articolo rilevato
-    for urlarticolo in urlarticoliarray:
+    # Analizzo ogni singolo articolo rilevato da La Stampa
+    for urlarticolo in urlarticolilastampaarray:
 
         # LaStampa fornice anche la versione AMP di ogni articolo, analizzo questa versione poiche riduce gli errori
         # del parsing del testo tramite mercury
@@ -177,10 +198,13 @@ def main():
 
         # Verifico se l articolo e stato scritto da Carola in caso affermativo analizzo l'articolo e lo aggiungo al Feed
         if check_carola(urlarticolo):
-            print "Trovato articolo: " + urlarticolo
-
             title, description = mercuryparser(urlarticolo)
             add_feed(title, description, urlarticolo)
+
+    # Analizzo ogni singolo articolo rilevato da AGI
+    for urlarticolo in urlarticolilagiarray:
+        title, description = mercuryparser(urlarticolo)
+        add_feed(title, description, urlarticolo)
 
 
 if __name__ == "__main__":
