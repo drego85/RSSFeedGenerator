@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # This file is part of RSS Generator Feed.
 #
 # Copyright(c) 2017 Andrea Draghetti
@@ -19,13 +19,13 @@
 
 import sys
 import pytz
+import urllib
 import Config
-import hashlib
+import pickle
 import base64
+import hashlib
 import datetime
 import requests
-import pickle
-import urllib
 from bs4 import BeautifulSoup
 from podgen import Podcast, Episode, Media
 
@@ -118,7 +118,7 @@ def main():
             for link in h1.find_all("a", href=True):
 
                 episodeLink = "https://www.mixcloud.com%s" % link["href"]
-                episodeLinkHash = hashlib.sha1(episodeLink.encode()).hexdigest()
+                episodeLinkHash = hashlib.sha1(episodeLink).hexdigest()
 
                 for span in link.find_all("span"):
                     episodeTitle = span.get("title")
