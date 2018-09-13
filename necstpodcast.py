@@ -118,6 +118,9 @@ def main():
             for link in h1.find_all("a", href=True):
 
                 episodeLink = "https://www.mixcloud.com%s" % link["href"]
+
+                print(episodeLink)
+
                 episodeLinkHash = hashlib.sha1(episodeLink).hexdigest()
 
                 for span in link.find_all("span"):
