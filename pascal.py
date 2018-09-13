@@ -112,7 +112,7 @@ def main():
 
     for div in soup.find_all("div", attrs={"class": "row listaAudio "}):
 
-        risorsaaudio = puntataTitolo = puntataLink = puntataMp3 = ""
+        risorsaaudio = puntataTitolo = puntataData = puntataLink = puntataSize = puntataMp3 = ""
 
         if div.get("data-mediapolis"):
             risorsaaudio = div.get("data-mediapolis")
