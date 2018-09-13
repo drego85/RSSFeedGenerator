@@ -80,7 +80,7 @@ def genero_feed(puntateList):
         for puntata in puntateList:
             episode = Episode()
 
-            episode.title = puntata[1]
+            episode.title = puntata[1].encode("ascii", "ignore")
             episode.link = puntata[2]
 
             # La dimensione del file e approssimativa
@@ -94,7 +94,7 @@ def genero_feed(puntateList):
             p.episodes.append(episode)
 
         # Print to stdout, just as an example
-        p.rss_file(rssfile.encode("ascii", "ignore"), minimize=False, encoding="UTF-8")
+        p.rss_file(rssfile, minimize=False)
 
 
 def main():
