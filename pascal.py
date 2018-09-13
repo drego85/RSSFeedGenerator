@@ -71,13 +71,6 @@ def genero_feed(puntateList):
 
 
 def main():
-    # Ottengo la lista delle puntante gia analizzate
-    puntateList = load_analyzed_case()
-
-    # Estrapolo dalla lista appena ottenuta i soli Hash delle puntate precedenti
-    puntateHash = []
-    for puntante in puntateList:
-        puntateHash.append(puntante[0])
 
     # Analizzo tutte le puntante pubblicate sul sito per individuarne di nuove
     urlpuntante = "https://www.raiplayradio.it/programmi/pascal/archivio/puntate/"
