@@ -83,7 +83,7 @@ def genero_feed(episodesList):
             episode = Episode()
 
             episode.title = episodedetails[1].encode("ascii", "ignore")
-            episode.link = episodedetails[2]
+            episode.link = episodedetails[2].encode("ascii", "ignore")
 
             # La dimensione e statistica in base alle puntante analizzate
             episode.media = Media(episodedetails[3], 30000000, type="audio/x-m4a", duration=None)
