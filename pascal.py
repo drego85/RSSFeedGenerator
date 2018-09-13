@@ -20,7 +20,8 @@
 import sys
 import pytz
 import Config
-import base64
+import pickle
+import hashlib
 import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -30,8 +31,6 @@ from podgen import Podcast, Episode, Media
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
                  "Accept-Language": "it"}
 timeoutconnection = 120
-
-puntatearray = []
 risorseaudioarray = []
 
 rssfile = Config.outputpath + "pascal.xml"
@@ -39,90 +38,33 @@ rssfile = Config.outputpath + "pascal.xml"
 
 def load_analyzed_case():
     try:
-        with open("pascal_analyzed.txt", "r") as f:
-            for line in f:
-                if line[-1] == "\n":
-                    if line != "\n":
-                        puntatearray.append(line[:-1])
-                else:
-                    if line != "":
-                        puntatearray.append(line)
+        with open("pascal_analyzed.txt", "rb") as fp:
+            if fp:
+                puntateList = pickle.load(fp)
+
+        return puntateList
+
     except IOError as e:
-        print "I/O error on read Keywords File({0}): {1}".format(e.errno, e.strerror)
+        print(e)
+        sys.exit()
+    except Exception:
+        return []
+
+
+def save_analyzed_case(puntateList):
+    try:
+        with open("pascal_analyzed.txt", "wb") as fp:
+            pickle.dump(puntateList, fp)
+    except IOError as e:
+        print(e)
         sys.exit()
     except Exception as e:
-        print str(e)
-        print "Unexpected error on read Keywords File:", sys.exc_info()[0]
+        print(e)
         raise
 
 
-def save_analyzed_case(casehash):
-    try:
-        with open("pascal_analyzed.txt", "r+") as f:
-            file_data = f.read()
-            f.seek(0, 0)
-            f.write(casehash + "\n" + file_data)
-
-    except IOError as e:
-        print "I/O error on write Last Analyzed File({0}): {1}".format(e.errno, e.strerror)
-    except:
-        print "Unexpected error on write Last Analyzed File:", sys.exc_info()[0]
-        raise
-
-
-def load_puntate(url):
-    response = requests.post(url, headers=headerdesktop, timeout=timeoutconnection)
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    nuovapuntata = False
-
-    for div in soup.find_all("div", attrs={"class": "columns large-4 medium-6 small-6 bloccoPlaylist containerOption"}):
-        for div2 in div.find_all("div", attrs={"class": "programItemPlaylist"}):
-            titolo = data = ""
-
-            risorsaaudio = div2.get("data-mediapolis")
-            risorsaaudiob64 = base64.b64encode(div2.get("data-mediapolis"))
-
-            if risorsaaudiob64 not in risorseaudioarray:
-
-                print "Rilevata nuova puntata: " + risorsaaudio
-
-                # Ottengo l'URL del MP3
-                response = requests.post(risorsaaudio, headers=headerdesktop, timeout=timeoutconnection)
-
-                linkmp3 = base64.b64encode(response.url)
-
-                for title in div.find_all("h3"):
-                    titolo = base64.b64encode(title.text.encode("ascii", "ignore"))
-
-                for date in div.find_all("span", attrs={"class": "canale"}):
-                    data = base64.b64encode(date.text.encode("ascii", "ignore"))
-
-                nuovapuntata = True
-                puntatearray.insert(0, titolo + "|" + data + "|" + linkmp3 + "|" + risorsaaudiob64)
-                save_analyzed_case(titolo + "|" + data + "|" + linkmp3 + "|" + risorsaaudiob64)
-
-    return nuovapuntata
-
-
-def main():
-    # URL riepilogativo delle puntate di pascal
-    url = "http://www.raiplayradio.it/programmi/pascal/archivio/puntate/"
-
-    # Carico le puntate gia analizzate
-    load_analyzed_case()
-
-    # Splitto l'array per creare l'array con i soli mp3
-    for data in puntatearray:
-        if data:
-            risorseaudioarray.append(data.split("|")[3])
-
-    # Verifico se vi sono nuove puntate
-    nuovapuntata = load_puntate(url)
-
-    # Se e stata rilevata una nuova puntata rigenero il feed
-    if nuovapuntata:
-
+def genero_feed(puntateList):
+    if puntateList:
         # Creo un nuovo podcast
         p = Podcast()
 
@@ -135,21 +77,67 @@ def main():
         p.copyright = "Rai Radio 2"
         p.language = "it-IT"
 
-        for data in puntatearray:
+        for puntata in puntateList:
             episode = Episode()
 
-            episode.title = base64.b64decode(data.split("|")[0])
+            episode.title = puntata[1]
+            episode.link = puntata[2]
 
             # La dimensione del file e approssimativa
-            episode.media = Media(base64.b64decode(data.split("|")[2]), 56722176)
-            episode.publication_date = datetime.datetime(int(base64.b64decode(data.split("|")[1]).split("/")[2]),
-                                                         int(base64.b64decode(data.split("|")[1]).split("/")[1]),
-                                                         int(base64.b64decode(data.split("|")[1]).split("/")[0]), 02,
+            episode.media = Media(puntata[4], puntata[5])
+            episode.publication_date = datetime.datetime(int(puntata[3].split("/")[2]),
+                                                         int(puntata[3].split("/")[1]),
+                                                         int(puntata[3].split("/")[0]), 02,
                                                          00, tzinfo=pytz.utc)
             p.episodes.append(episode)
 
         # Print to stdout, just as an example
         p.rss_file(rssfile, minimize=False)
+
+
+def main():
+    # Ottengo la lista delle puntante gia analizzate
+    puntateList = load_analyzed_case()
+
+    # Estrapolo dalla lista appena ottenuta i soli Hash delle puntate precedenti
+    puntateHash = []
+    for puntante in puntateList:
+        puntateHash.append(puntante[0])
+
+    # Analizzo tutte le puntante pubblicate sul sito per individuarne di nuove
+    urlpuntante = "https://www.raiplayradio.it/programmi/pascal/archivio/puntate/"
+
+    response = requests.get(urlpuntante, headers=headerdesktop, timeout=timeoutconnection)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    for div in soup.find_all("div", attrs={"class": "row listaAudio "}):
+
+        risorsaaudio = puntataTitolo = puntataLink = puntataMp3 = ""
+
+        if div.get("data-mediapolis"):
+            risorsaaudio = div.get("data-mediapolis")
+            risorsaaudiohash = hashlib.sha1(risorsaaudio).hexdigest()
+
+            # Ottengo il titolo e url di riferimento della nuova puntata
+            for link in div.find_all("a", href=True):
+                puntataTitolo = link.text
+                puntataLink = "https://www.raiplayradio.it%s" % link["href"]
+
+            # Ottengo la data della puntata
+            for span in div.find_all("span", attrs={"class": "canale"}):
+                puntataData = span.text
+
+            # Ottengo l'URL del MP3
+            response = requests.get(risorsaaudio, headers=headerdesktop, timeout=timeoutconnection)
+            if response:
+                puntataMp3 = response.url
+                puntataSize = response.headers["Content-length"]
+
+            # Appendo alla lista la nuova puntanta
+            puntateList.insert(0, [risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
+
+
+    genero_feed(puntateList)
 
 
 if __name__ == "__main__":
