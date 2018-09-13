@@ -118,27 +118,30 @@ def main():
             for link in h1.find_all("a", href=True):
 
                 episodeLink = "https://www.mixcloud.com%s" % link["href"]
+                print(episodeLink)
+
                 episodeLinkHash = hashlib.sha1(episodeLink.encode("ascii", "ignore")).hexdigest()
+                print(episodeLinkHash)
 
-                for span in link.find_all("span"):
-                    episodeTitle = span.get("title")
+                episodeTitle = link.find("span").get("title")
+                print(episodeTitle)
 
-        if episodeLinkHash not in episodesHash:
+                if episodeLinkHash not in episodesHash:
 
-            # Ottengo l'URL della nuova risorsa audio
-            mixclouddownloader = "http://www.mixcloud-downloader.com/download/"
-            data = {"url": episodeLink}
-            response = requests.post(mixclouddownloader, data=data, headers=headerdesktop, timeout=timeoutconnection)
-            soup = BeautifulSoup(response.text, "html.parser")
+                    # Ottengo l'URL della nuova risorsa audio
+                    mixclouddownloader = "http://www.mixcloud-downloader.com/download/"
+                    data = {"url": episodeLink}
+                    response = requests.post(mixclouddownloader, data=data, headers=headerdesktop, timeout=timeoutconnection)
+                    soup = BeautifulSoup(response.text, "html.parser")
 
-            for link in soup.find_all("a", href=True):
-                if "mixcloud.com" in link["href"]:
-                    episodeAudio = link["href"]
+                    for link in soup.find_all("a", href=True):
+                        if "mixcloud.com" in link["href"]:
+                            episodeAudio = link["href"]
 
-            # Aggiungo alla lista la nuova puntanta
-            if episodeAudio:
-                episodeDate = pytz.utc.localize(datetime.datetime.utcnow())
-                episodesList.insert(0, [episodeLinkHash, episodeTitle, episodeLink, episodeAudio, episodeDate])
+                    # Aggiungo alla lista la nuova puntanta
+                    if episodeAudio:
+                        episodeDate = pytz.utc.localize(datetime.datetime.utcnow())
+                        episodesList.insert(0, [episodeLinkHash, episodeTitle, episodeLink, episodeAudio, episodeDate])
 
     # Salvo la lista delle puntante
     save_analyzed_case(episodesList)
