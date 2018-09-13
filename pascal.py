@@ -85,7 +85,9 @@ def genero_feed(puntateList):
 
             # La dimensione del file e approssimativa
             episode.media = Media(puntata[4], puntata[5])
-            episode.publication_date = datetime.datetime(int(puntata[3].split("/")[2]),
+
+            if puntata[3]:
+                episode.publication_date = datetime.datetime(int(puntata[3].split("/")[2]),
                                                          int(puntata[3].split("/")[1]),
                                                          int(puntata[3].split("/")[0]), 02,
                                                          00, tzinfo=pytz.utc)
