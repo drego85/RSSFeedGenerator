@@ -20,8 +20,6 @@
 import sys
 import pytz
 import Config
-import pickle
-import hashlib
 import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -53,16 +51,16 @@ def genero_feed(puntateList):
         for puntata in puntateList:
             episode = Episode()
 
-            episode.title = puntata[1].encode("ascii", "ignore")
-            episode.link = puntata[2]
+            episode.title = puntata[0].encode("ascii", "ignore")
+            episode.link = puntata[1]
 
             # La dimensione del file e approssimativa
-            episode.media = Media(puntata[4], puntata[5])
+            episode.media = Media(puntata[3], puntata[4])
 
-            if puntata[3]:
-                episode.publication_date = datetime.datetime(int(puntata[3].split("/")[2]),
-                                                             int(puntata[3].split("/")[1]),
-                                                             int(puntata[3].split("/")[0]), 02,
+            if puntata[2]:
+                episode.publication_date = datetime.datetime(int(puntata[2].split("/")[2]),
+                                                             int(puntata[2].split("/")[1]),
+                                                             int(puntata[2].split("/")[0]), 02,
                                                              00, tzinfo=pytz.utc)
             p.episodes.append(episode)
 
@@ -82,11 +80,8 @@ def main():
 
     for div in soup.find_all("div", attrs={"class": "row listaAudio "}):
 
-        risorsaaudio = puntataTitolo = puntataData = puntataLink = puntataSize = puntataMp3 = ""
-
         if div.get("data-mediapolis"):
             risorsaaudio = div.get("data-mediapolis")
-            risorsaaudiohash = hashlib.sha1(risorsaaudio).hexdigest()
 
             # Ottengo il titolo e url di riferimento della nuova puntata
             puntataTitolo = div.find("a", href=True).text.strip()
@@ -102,7 +97,7 @@ def main():
                 puntataSize = response.headers["Content-length"]
 
                 # Appendo alla lista la nuova puntanta
-                puntateList.append([risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
+                puntateList.append([puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
 
     genero_feed(puntateList)
 
