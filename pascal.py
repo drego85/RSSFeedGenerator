@@ -71,6 +71,8 @@ def genero_feed(puntateList):
 
 
 def main():
+    # Definisco una lista delle puntate
+    puntateList = []
 
     # Analizzo tutte le puntante pubblicate sul sito per individuarne di nuove
     urlpuntante = "https://www.raiplayradio.it/programmi/pascal/archivio/puntate/"
