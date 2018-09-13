@@ -60,7 +60,7 @@ def genero_feed(puntateList):
             if puntata[2]:
                 episode.publication_date = datetime.datetime(int(puntata[2].split("/")[2]),
                                                              int(puntata[2].split("/")[1]),
-                                                             int(puntata[2].split("/")[0]), 02,
+                                                             int(puntata[2].split("/")[0]), 20,
                                                              00, tzinfo=pytz.utc)
             p.episodes.append(episode)
 
