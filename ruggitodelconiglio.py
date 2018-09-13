@@ -43,7 +43,7 @@ def genero_feed(puntateList):
         p.description = "Il Ruggito del Coniglio, il programma cult di Radio 2 condotto da Marco Presta e Antonello Dose, racconta l'attualita con folgorante ironia."
         p.website = "http://www.raiplayradio.it/programmi/ilruggitodelconiglio/"
         p.explicit = True
-        p.image = "https://rss.draghetti.it/pascal_image.jpg"
+        p.image = "https://rss.draghetti.it/ruggitodelconiglio_image.jpg"
         p.feed_url = "https://rss.draghetti.it/ruggitodelconiglio.xml"
         p.copyright = "Rai Radio 2"
         p.language = "it-IT"
