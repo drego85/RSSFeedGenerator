@@ -136,7 +136,7 @@ def main():
                 puntataSize = response.headers["Content-length"]
 
             # Appendo alla lista la nuova puntanta
-            puntateList.insert(0, [risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
+            puntateList.append([risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
 
 
     genero_feed(puntateList)
