@@ -118,13 +118,8 @@ def main():
             for link in h1.find_all("a", href=True):
 
                 episodeLink = "https://www.mixcloud.com%s" % link["href"]
-                print(episodeLink)
-
                 episodeLinkHash = hashlib.sha1(episodeLink.encode("ascii", "ignore")).hexdigest()
-                print(episodeLinkHash)
-
                 episodeTitle = link.find("span").get("title")
-                print(episodeTitle)
 
                 if episodeLinkHash not in episodesHash:
 
