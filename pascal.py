@@ -94,7 +94,7 @@ def genero_feed(puntateList):
             p.episodes.append(episode)
 
         # Print to stdout, just as an example
-        p.rss_file(rssfile, minimize=False, encoding="UTF-8")
+        p.rss_file(rssfile.encode("ascii", "ignore"), minimize=False, encoding="UTF-8")
 
 
 def main():
