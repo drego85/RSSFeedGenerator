@@ -36,33 +36,6 @@ risorseaudioarray = []
 rssfile = Config.outputpath + "pascal.xml"
 
 
-def load_analyzed_case():
-    try:
-        with open("pascal_analyzed.txt", "rb") as fp:
-            if fp:
-                puntateList = pickle.load(fp)
-
-        return puntateList
-
-    except IOError as e:
-        print(e)
-        sys.exit()
-    except Exception:
-        return []
-
-
-def save_analyzed_case(puntateList):
-    try:
-        with open("pascal_analyzed.txt", "wb") as fp:
-            pickle.dump(puntateList, fp)
-    except IOError as e:
-        print(e)
-        sys.exit()
-    except Exception as e:
-        print(e)
-        raise
-
-
 def genero_feed(puntateList):
     if puntateList:
         # Creo un nuovo podcast
@@ -88,9 +61,9 @@ def genero_feed(puntateList):
 
             if puntata[3]:
                 episode.publication_date = datetime.datetime(int(puntata[3].split("/")[2]),
-                                                         int(puntata[3].split("/")[1]),
-                                                         int(puntata[3].split("/")[0]), 02,
-                                                         00, tzinfo=pytz.utc)
+                                                             int(puntata[3].split("/")[1]),
+                                                             int(puntata[3].split("/")[0]), 02,
+                                                             00, tzinfo=pytz.utc)
             p.episodes.append(episode)
 
         # Print to stdout, just as an example
@@ -121,23 +94,21 @@ def main():
             risorsaaudiohash = hashlib.sha1(risorsaaudio).hexdigest()
 
             # Ottengo il titolo e url di riferimento della nuova puntata
-            for link in div.find_all("a", href=True):
-                puntataTitolo = link.text
-                puntataLink = "https://www.raiplayradio.it%s" % link["href"]
+            puntataTitolo = div.find("a", href=True).text.strip()
+            puntataLink = "https://www.raiplayradio.it%s" % div.find("a", href=True).get("href")
 
             # Ottengo la data della puntata
-            for span in div.find_all("span", attrs={"class": "canale"}):
-                puntataData = span.text
+            puntataData = div.find("span", attrs={"class": "canale"}).text
 
             # Ottengo l'URL del MP3
             response = requests.get(risorsaaudio, headers=headerdesktop, timeout=timeoutconnection)
-            if response:
+            if response.status_code is 200:
                 puntataMp3 = response.url
                 puntataSize = response.headers["Content-length"]
 
-            # Appendo alla lista la nuova puntanta
-            puntateList.append([risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
-
+                # Appendo alla lista la nuova puntanta
+                puntateList.insert(0,
+                                   [risorsaaudiohash, puntataTitolo, puntataLink, puntataData, puntataMp3, puntataSize])
 
     genero_feed(puntateList)
 
