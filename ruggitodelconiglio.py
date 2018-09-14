@@ -62,6 +62,9 @@ def genero_feed(puntateList):
                                                              int(puntata[2].split("/")[1]),
                                                              int(puntata[2].split("/")[0]), 10,
                                                              00, tzinfo=pytz.utc)
+            else:
+                episode.publication_date = pytz.utc.localize(datetime.datetime.utcnow())
+
             p.episodes.append(episode)
 
         # Print to stdout, just as an example
