@@ -145,6 +145,16 @@ def scrap_agi(url):
                     urlarticolilagiarray.append(link["href"])
 
 
+def scrap_tinyletter(url):
+    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
+
+    for div in soupdesktop.find_all("div", attrs={"class": "message-body"}):
+        for link in div.find_all("a", attrs={"class": "message-link"}, href=True):
+            print(link["href"])
+            urlarticolilagiarray.append(link["href"])
+
+
 def mercuryparser(url):
     try:
         mercury = "https://mercury.postlight.com/parser?url="
@@ -174,6 +184,7 @@ def main():
     lastampa_home_url = "http://www.lastampa.it"
     lastampa_rss_url = "http://www.lastampa.it/rss.xml"
     agi_search_url = "https://www.agi.it/search/?keyword=frediani&sortField=pubdate"
+    tinyletter_url = "https://tinyletter.com/carolafrediani/archive"
 
     # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
     scrap_lastampa_rss(lastampa_rss_url)
@@ -184,6 +195,9 @@ def main():
 
     # Acquisisco gli URL degli articoli su AGI
     scrap_agi(agi_search_url)
+
+    # Acquisisco gli URL degli articolo su Tinyletter
+    scrap_tinyletter(tinyletter_url)
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
