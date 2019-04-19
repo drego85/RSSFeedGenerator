@@ -23,8 +23,8 @@ import requests
 import feedparser
 from lxml import etree as ET
 from bs4 import BeautifulSoup
+from readability import Document
 from time import gmtime, strftime
-
 
 # User Agent MSIE 11.0 (Win 10)
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
@@ -32,7 +32,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "rositafeed.xml"
-urlarticoliarray = []
+articoliList = []
 
 
 def make_feed():
@@ -101,24 +101,14 @@ def scrap_repubblica(url):
 
                     linkdef = link["href"].replace("?ref=search", "")
 
-                    if not linkdef.startswith("http://"):
-                        urlarticoliarray.append("http:" + linkdef)
+                    if not linkdef.startswith("https://"):
+                        articoliList.append("http:" + linkdef)
                     else:
-                        urlarticoliarray.append(linkdef)
+                        articoliList.append(linkdef)
 
-
-
-def mercuryparser(url):
-    mercury = "https://mercury.postlight.com/parser?url="
-
-    page = requests.get(mercury + url, headers=Config.headermercury, timeout=timeoutconnection)
-    page.encoding = "UTF-8"
-    data = json.loads(page.text)
-
-    return data["title"], data["content"]
 
 def main():
-    url = "http://ricerca.repubblica.it/ricerca/repubblica?sortby=ddate&author=ROSITA+RIJTANO&mode=any"
+    url = "https://ricerca.repubblica.it/ricerca/repubblica?sortby=ddate&author=ROSITA+RIJTANO&mode=any"
 
     # Acquisisco tutti gli URL degli articoli attraverso il modulo di ricerca di Repubblica
     scrap_repubblica(url)
@@ -128,11 +118,12 @@ def main():
         make_feed()
 
     # Analizzo ogni singolo articolo rilevato
-    for urlarticolo in urlarticoliarray:
+    for urlarticolo in articoliList:
+        response = requests.get(urlarticolo, headers=headerdesktop, timeout=timeoutconnection)
 
-        print "Trovato articolo: " + urlarticolo
+        description = Document(response.text).summary()
+        title = Document(response.text).short_title()
 
-        title, description = mercuryparser(urlarticolo)
         add_feed(title, description, urlarticolo)
 
 

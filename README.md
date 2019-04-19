@@ -35,3 +35,4 @@ Special thanks:
 - Python
 - bs4 (pip install bs4)
 - feedparser (pip install feedparser)
+- readability (pip install readability-lxml)

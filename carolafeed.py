@@ -23,6 +23,7 @@ import requests
 import feedparser
 from lxml import etree as ET
 from bs4 import BeautifulSoup
+from readability import Document
 from time import gmtime, strftime
 
 # User Agent MSIE 11.0 (Win 10)
@@ -31,26 +32,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "carolafeed.xml"
-urlarticolilastampaarray = []
-urlarticolilagiarray = []
-
-
-def check_carola(url):
-    try:
-        pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-        soup = BeautifulSoup(pagedesktop.text, "html.parser")
-
-        autore = soup.find("span", attrs={"class": "author author14 fLeft"})
-        autore = str(autore.text).lower()
-        autore = autore.split(" ")
-
-        if ("carola" in autore and "frediani" in autore):
-            return True
-        else:
-            return False
-
-    except:
-        pass
+articoliList = []
 
 
 def make_feed():
@@ -108,93 +90,17 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def scrap_lastampa_home(url):
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-
-    for div in soupdesktop.find_all("div", attrs={"class": "ls-box-titolo"}):
-        for link in div.find_all("a", href=True):
-            if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticolilastampaarray.append("http://www.lastampa.it%s" % link["href"])
-
-    for div in soupdesktop.find_all("h1", attrs={"class": "article-title"}):
-        for link in div.find_all("a", href=True):
-            if link["href"].startswith(strftime("/%Y/%m")):
-                urlarticolilastampaarray.append("http://www.lastampa.it%s" % link["href"])
-
-
-def scrap_lastampa_rss(url):
-    feed = feedparser.parse(url)
-    for post in feed.entries:
-        urlarticolilastampaarray.append(post.link)
-
-
-def scrap_agi(url):
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-
-    for div in soupdesktop.find_all("div", attrs={"class": "js-box5 box5__article-container"}):
-
-        for author in div.find_all("b", attrs={"class": "box5__authorname"}):
-
-            autore = str(author.text.strip()).lower()
-            autore = autore.split(" ")
-
-            if ("carola" in autore and "frediani" in autore):
-                for link in div.find_all("a", attrs={"class": "box5__link"}, href=True):
-                    urlarticolilagiarray.append(link["href"])
-
-
 def scrap_tinyletter(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     for div in soupdesktop.find_all("div", attrs={"class": "message-body"}):
         for link in div.find_all("a", attrs={"class": "message-link"}, href=True):
-            print(link["href"])
-            urlarticolilagiarray.append(link["href"])
-
-
-def mercuryparser(url):
-    try:
-        mercury = "https://mercury.postlight.com/parser?url="
-
-        page = requests.get(mercury + url, headers=Config.headermercury, timeout=timeoutconnection)
-        page.encoding = "UTF-8"
-        data = json.loads(page.text)
-
-        if data:
-
-            return data["title"], data["content"]
-
-        else:
-
-            response = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-            soup = BeautifulSoup(response.text, "html.parser")
-            title = soup.title.string
-            description = "Impossibile recuperare il contenuto dell'articolo."
-
-            return title, description
-
-    except:
-        pass
+            articoliList.append(link["href"])
 
 
 def main():
-    lastampa_home_url = "http://www.lastampa.it"
-    lastampa_rss_url = "http://www.lastampa.it/rss.xml"
-    agi_search_url = "https://www.agi.it/search/?keyword=frediani&sortField=pubdate"
     tinyletter_url = "https://tinyletter.com/carolafrediani/archive"
-
-    # Acquisisco tutti gli URL degli articoli attraverso il Feed RSS del quotidiano
-    scrap_lastampa_rss(lastampa_rss_url)
-
-    # Acquisisco tutti gli URL degli articoli pubblicati in home, poiche il Feed RSS non contiene tutti gli articoli
-    # pubblicati online ma solo i piu rilevanti
-    scrap_lastampa_home(lastampa_home_url)
-
-    # Acquisisco gli URL degli articoli su AGI
-    scrap_agi(agi_search_url)
 
     # Acquisisco gli URL degli articolo su Tinyletter
     scrap_tinyletter(tinyletter_url)
@@ -203,21 +109,13 @@ def main():
     if os.path.exists(rssfile) is not True:
         make_feed()
 
-    # Analizzo ogni singolo articolo rilevato da La Stampa
-    for urlarticolo in urlarticolilastampaarray:
+    # Analizzo ogni singolo articolo rilevato
+    for urlarticolo in articoliList:
+        response = requests.get(urlarticolo, headers=headerdesktop, timeout=timeoutconnection)
 
-        # LaStampa fornice anche la versione AMP di ogni articolo, analizzo questa versione poiche riduce gli errori
-        # del parsing del testo tramite mercury
-        urlarticolo = urlarticolo.replace("/pagina.html", "/amphtml/pagina.amp.html")
+        description = Document(response.text).summary()
+        title = Document(response.text).short_title()
 
-        # Verifico se l articolo e stato scritto da Carola in caso affermativo analizzo l'articolo e lo aggiungo al Feed
-        if check_carola(urlarticolo):
-            title, description = mercuryparser(urlarticolo)
-            add_feed(title, description, urlarticolo)
-
-    # Analizzo ogni singolo articolo rilevato da AGI
-    for urlarticolo in urlarticolilagiarray:
-        title, description = mercuryparser(urlarticolo)
         add_feed(title, description, urlarticolo)
 
 
