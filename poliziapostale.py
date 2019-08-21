@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # This file is part of RSS Generator Feed.
 #
 # Copyright(c) 2017 Andrea Draghetti

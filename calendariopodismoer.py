@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # This file is part of RSS Generator Feed.
 #
@@ -20,9 +20,11 @@
 
 import os
 import sys
+import json
 import Config
 import requests
 import hashlib
+
 from lxml import etree as ET
 from bs4 import BeautifulSoup
 from time import gmtime, strftime
@@ -38,32 +40,33 @@ eventianalyzedarray = []
 
 def load_analyzed_case():
     try:
-        with open("calendariopodismoer_analyzed.txt", "r") as f:
-            for line in f:
-                if line[-1] == "\n":
-                    if line != "\n":
-                        eventianalyzedarray.append(line[:-1])
-                else:
-                    if line != "":
-                        eventianalyzedarray.append(line)
+        f = open("calendariopodismoer_analyzed.txt", "r", errors="ignore")
+
+        for line in f:
+            if line:
+                line = line.rstrip()
+                eventianalyzedarray.append(line)
+
+        f.close()
+
     except IOError as e:
-        print "I/O error on read Keywords File({0}): {1}".format(e.errno, e.strerror)
+        print(e)
         sys.exit()
     except Exception as e:
-        print str(e)
-        print "Unexpected error on read Keywords File:", sys.exc_info()[0]
+        print(e)
         raise
 
 
 def save_analyzed_case(casehash):
     try:
         f = open("calendariopodismoer_analyzed.txt", "a")
-        f.write(casehash + "\n")
+        f.write(str(casehash) + "\n")
         f.close()
     except IOError as e:
-        print "I/O error on write Last Analyzed File({0}): {1}".format(e.errno, e.strerror)
-    except:
-        print "Unexpected error on write Last Analyzed File:", sys.exc_info()[0]
+        print(e)
+        sys.exit()
+    except Exception as e:
+        print(e)
         raise
 
 
@@ -92,7 +95,7 @@ def make_feed():
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def add_feed(titlefeed, descriptionfeed, linkfeed):
+def add_feed(titlefeed, luogo, data, descrizione, immagini, linkfeed):
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.parse(rssfile, parser)
     channel = tree.getroot()
@@ -105,12 +108,19 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     item = ET.SubElement(channel, "item")
 
     title = ET.SubElement(item, "title")
-    title.text = titlefeed
+    title.text = titlefeed + " " + luogo + " " + data
 
     link = ET.SubElement(item, "link")
     link.text = linkfeed
 
     description = ET.SubElement(item, "description")
+
+    descriptionfeed = "<html> <body>" + descrizione + "<br> <br>"
+    if immagini:
+        for immagine in immagini:
+            descriptionfeed += "<img src='" + immagine + "'> <br>"
+    descriptionfeed += "</body> </html>"
+
     description.text = descriptionfeed
 
     pubDate = ET.SubElement(item, "pubDate")
@@ -123,7 +133,11 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 
 
 def main():
-    url = "http://www.calendariopodismo.it/index.php?dove=3&regoprov=regione&tipogara=0"
+    url = "https://www.calendariopodismo.it/api/Api/app/gare"
+
+    headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
+                     "Accept-Language": "it",
+                     "Content-Type": "application/json"}
 
     # Carico casi gia analizzati
     load_analyzed_case()
@@ -133,59 +147,37 @@ def main():
         make_feed()
 
     # Ottengo la lista degli eventi pubblicati
+    payload = '{"Regione": "3", "Provincia": "0", "Categoria": "0", "GiornoDa": "", "GiornoA": "", "from": 0, "limit": 0}'
+    page = requests.post(url, headers=headerdesktop, timeout=timeoutconnection, data=payload)
 
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
-    soup = BeautifulSoup(pagedesktop.text, "html.parser")
+    data = json.loads(page.text)
 
-    for table in soup.find_all("table", attrs={"class": "tab"}):
-
-        for idx, row in enumerate(table.findAll("tr", onclick=True)):
-
-            cells = row.findAll("td")
-            title = cells[2].find(text=True).encode("ascii", "ignore") + " - " + cells[1].find(text=True).encode(
-                "ascii", "ignore")
-
-            linkevento = row["onclick"]
-            linkevento = linkevento.replace("javascript:document.location='", "")
-            linkevento = linkevento.replace("';", "")
-            linkevento = "https://www.calendariopodismo.it/" + linkevento
+    if data:
+        for each in data["data"]["gare"]:
+            linkevento = "https://www.calendariopodismo.it/" + each["Progressivo"]
+            title = each["NomeCorsa"]
+            luogo = each["Luogo"]
+            data = each["Giorno"]
 
             # Genero HASH che identifica univocamente l'evento in base al link
-            casehash = hashlib.sha256(linkevento).hexdigest()
+            casehash = hashlib.sha256(linkevento.encode()).hexdigest()
 
             if casehash not in eventianalyzedarray:
+                url = "https://www.calendariopodismo.it/api/Api/app/gara/" + each["Progressivo"]
 
-                # Ottengo la descrizione dell'evento
-                pagedesktop = requests.get(linkevento, headers=headerdesktop, timeout=timeoutconnection)
-                soup = BeautifulSoup(pagedesktop.text, "html.parser")
+                page2 = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
 
-                description = ""
+                data2 = json.loads(page2.text)
 
-                for idx, table2 in enumerate(soup.find_all("table", attrs={"align": "center"})):
-
-                    # La prima e la seconda tabella non ci interessano le salto e proseguo
-                    if idx == 0 or idx == 1:
-                        continue
-
-                    for idx, row in enumerate(table2.findAll("tr")):
-
-                        # Le celle che non ci interessano le salto e proseguo
-                        if idx == 2 or idx == 3 or idx == 4 or idx == 6 or idx == 7:
-                            continue
-
-                        description = description + str(row)
-
-                    try:
-                        description = description.replace("src=\"", "align=\"center\" src=\"https://www.calendariopodismo.it/")
-                    except:
-                        pass
-
-                description = "<table align=\"center\">" + description + "</table>"
-
-                description = description.decode("ascii", "ignore")
+                if data2:
+                    descrizione = data2["data"]["gara"]["Dettaglio"]
+                    immagini = data2["data"]["gara"]["listIMG"]
+                else:
+                    descrizione = ""
+                    immagini = ""
 
                 # Aggiungo l'evento al FEED
-                add_feed(title, description, linkevento)
+                add_feed(title, luogo, data, descrizione, immagini, linkevento)
 
                 # Salvo il caso
                 eventianalyzedarray.append(casehash)
