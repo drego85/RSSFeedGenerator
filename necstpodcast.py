@@ -71,7 +71,7 @@ def genero_feed(episodesList):
         p = Podcast()
 
         p.name = "NECST Tech Time"
-        p.description = "The NECSTLab (Novel, Emerging Computing System Technologies Laboratory) is a laboratory inside DEIB department of Politecnico di Milano, where there are a number of different research lines on advanced topics in computing systems: from architectural characteristics, to hardware-software codesign methodologies, to security and dependability issues of complex system architectures (scaling from mobile devices to large virtualized datacenters)."
+        p.description = "Feed Podcast non ufficiale di NECST Tech Time - Powered By Andrea Draghetti"
         p.website = "http://www.poliradio.it/podcast/programmi/34/necst-tech-time"
         p.explicit = True
         p.image = "https://rss.draghetti.it/necst_image.jpg"
