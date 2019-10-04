@@ -97,12 +97,12 @@ def scrap_homepage(url):
     for ul in soupdesktop.find_all("ul", attrs={"class": "nav list-contents list-blog nav-level-1"}):
 
         for link in ul.find_all("a", href=True):
-            linkdef = url + link["href"]
+            linkdef = "https://www.certego.net" + link["href"]
             articoliList.append(linkdef)
 
 
 def main():
-    url = "https://www.certego.net/it/news"
+    url = "https://www.certego.net/it/news/"
 
     # Acquisisco tutti gli URL degli articoli attraverso il modulo di ricerca di Repubblica
     scrap_homepage(url)
