@@ -102,10 +102,10 @@ def scrap_zdnet(url):
 def main():
     url = "https://www.zdnet.com/meet-the-team/us/catalin.cimpanu/"
 
-    # Acquisisco tutti gli URL degli articoli attraverso il modulo di ricerca di Repubblica
+    # Acquisisco tutti gli URL degli articoli scritto da Catalin
     scrap_zdnet(url)
 
-    # Se non esiste localmente un file XML procedo a crearlo.
+    # Se non esiste localmente un file XML procedo a crearlo
     if os.path.exists(rssfile) is not True:
         make_feed()
 

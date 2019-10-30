@@ -104,7 +104,7 @@ def scrap_homepage(url):
 def main():
     url = "https://www.certego.net/it/news/"
 
-    # Acquisisco tutti gli URL degli articoli attraverso il modulo di ricerca di Repubblica
+    # Acquisisco tutti gli URL pubblicati sul sito di Certego
     scrap_homepage(url)
 
     # Se non esiste localmente un file XML procedo a crearlo.
