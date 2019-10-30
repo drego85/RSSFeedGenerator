@@ -93,8 +93,8 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 def scrap_lastampa(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-    print(pagedesktop.text)
-    articoliList.append(soupdesktop.find("article", attrs={"class": "entry entry__hybrid "}).find("a")["href"])
+
+    articoliList.append(soupdesktop.find("article", attrs={"class": ["entry", "entry__hybrid"]}).find("h2", attrs={"class": "entry__title"}).find("a")["href"])
 
 def main():
     url = "https://www.lastampa.it/"
