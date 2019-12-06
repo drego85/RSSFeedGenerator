@@ -71,7 +71,7 @@ def genero_feed(episodesList):
         p = Podcast()
 
         p.name = "All You Can Dance by Dino Brawn"
-        p.description = "Feed Podcast non ufficiale di All You Can Dance by Dino Brawn - Powered By Andrea Draghetti"
+        p.description = "Feed Podcast non ufficiale di All You Can Dance by Dino Brown - Powered By Andrea Draghetti"
         p.website = "https://onedance.fm/"
         p.explicit = True
         p.image = "https://rss.draghetti.it/allyoucandance_image.jpg"
