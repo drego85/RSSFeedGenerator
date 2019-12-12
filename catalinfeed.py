@@ -65,7 +65,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree = ET.parse(rssfile, parser)
     channel = tree.getroot()
 
-    # Escludo eventuali duplicati in base al link
+    # Exclude duplicated articles
     for i in channel.findall(".//link"):
         if (i.text == linkfeed):
             return
@@ -102,14 +102,14 @@ def scrap_zdnet(url):
 def main():
     url = "https://www.zdnet.com/meet-the-team/us/catalin.cimpanu/"
 
-    # Acquisisco tutti gli URL degli articoli scritto da Catalin
+    # I get all the URLs of the articles written by the author
     scrap_zdnet(url)
 
-    # Se non esiste localmente un file XML procedo a crearlo
+    # If doesn't exist local XML file, I generate it
     if os.path.exists(rssfile) is not True:
         make_feed()
 
-    # Analizzo ogni singolo articolo rilevato
+    # I analyze each articles found
     for urlarticolo in articoliList:
         response = requests.get(urlarticolo, headers=headerdesktop, timeout=timeoutconnection)
 
