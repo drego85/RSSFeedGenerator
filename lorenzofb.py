@@ -105,6 +105,11 @@ def main():
     # I get all the URLs of the articles written by the author
     scrap_vice(url)
 
+    url = "https://www.vice.com/en_us/contributor/lorenzo-franceschi-bicchierai"
+
+    # I get all the URLs of the articles written by the author
+    scrap_vice(url)
+
     # If doesn't exist local XML file, I generate it
     if os.path.exists(rssfile) is not True:
         make_feed()
