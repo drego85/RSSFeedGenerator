@@ -97,22 +97,21 @@ def scrap_tinyletter(url):
         for link in div.find_all("a", attrs={"class": "message-link"}, href=True):
             articoliList.append(link["href"])
 
+
 def scrap_substack(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     for h1 in soupdesktop.find_all("h1", attrs={"class": "post-title long"}):
         for link in h1.find_all("a", href=True):
-            articoliList.append("https://guerredirete.substack.com" + link["href"])
+            if link["href"].startswith("https://guerredirete.substack.com"):
+                articoliList.append(link["href"])
+            else:
+                articoliList.append("https://guerredirete.substack.com" + link["href"])
 
 
 def main():
-    tinyletter_url = "https://tinyletter.com/carolafrediani/archive"
-
     substack_url = "https://guerredirete.substack.com/"
-
-    # Acquisisco gli URL degli articolo su Tinyletter
-    scrap_tinyletter(tinyletter_url)
 
     # Acquisisco gli URL degli articolo su Substack
     scrap_substack(substack_url)
