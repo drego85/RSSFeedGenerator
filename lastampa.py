@@ -106,6 +106,12 @@ def scrap_lastampa(url):
     except:
         pass
 
+    try:
+        articoliList.append(soupdesktop.find("article", attrs={"class": "entry__giant"}).find("h2", attrs={
+            "class": "entry__title"}).find("a")["href"])
+    except:
+        pass
+
 
 def main():
     url = "https://www.lastampa.it/"

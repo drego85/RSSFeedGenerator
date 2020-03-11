@@ -90,7 +90,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def scrap_lastampa(url):
+def scrap_ilpost(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
@@ -103,7 +103,7 @@ def main():
     url = "https://www.ilpost.it/"
 
     # Acquisisco l'articolo principale
-    scrap_lastampa(url)
+    scrap_ilpost(url)
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
