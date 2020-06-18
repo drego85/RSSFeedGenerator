@@ -1,0 +1,6 @@
+bs4
+lxml
+podgen
+requests
+feedparser
+readability-lxml
