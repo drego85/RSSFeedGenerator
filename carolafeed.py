@@ -101,8 +101,7 @@ def scrap_tinyletter(url):
 def scrap_substack(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
-
-    for h1 in soupdesktop.find_all("h1", attrs={"class": "post-title long"}):
+    for h1 in soupdesktop.find_all("h1", attrs={"class": "post-title"}):
         for link in h1.find_all("a", href=True):
             if link["href"].startswith("https://guerredirete.substack.com"):
                 articoliList.append(link["href"])
@@ -111,7 +110,7 @@ def scrap_substack(url):
 
 
 def main():
-    substack_url = "https://guerredirete.substack.com/"
+    substack_url = "https://guerredirete.substack.com/?no_cover=true"
 
     # Acquisisco gli URL degli articolo su Substack
     scrap_substack(substack_url)
