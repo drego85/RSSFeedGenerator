@@ -94,10 +94,13 @@ def scrap_ilpost(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    articoliList.append(
-        soupdesktop.find("div", attrs={"class": "entry-content"}).find("h2", attrs={"class": "entry-title"}).find("a")[
-            "href"])
+    # Ottengo i primi due articoli di rielivo
+    article = 2
 
+    for div in soupdesktop.find_all("div", attrs={"class": "entry-content"}):
+        if article > 0:
+            print(div.find("h2", attrs={"class": "entry-title"}).find("a")["href"])
+            article -= 1
 
 def main():
     url = "https://www.ilpost.it/"
