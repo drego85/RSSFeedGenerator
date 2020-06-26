@@ -99,7 +99,7 @@ def scrap_ilpost(url):
 
     for div in soupdesktop.find_all("div", attrs={"class": "entry-content"}):
         if article > 0:
-            print(div.find("h2", attrs={"class": "entry-title"}).find("a")["href"])
+            articoliList.append(div.find("h2", attrs={"class": "entry-title"}).find("a")["href"])
             article -= 1
 
 def main():
