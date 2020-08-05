@@ -19,19 +19,27 @@
 
 import sys
 import pytz
-import urllib
 import Config
 import pickle
-import base64
 import hashlib
 import datetime
 import requests
+import feedparser
 from bs4 import BeautifulSoup
 from podgen import Podcast, Episode, Media
 
 # User Agent MSIE 11.0 (Win 10)
 headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
                  "Accept-Language": "it"}
+
+headerdesktopsavelink = {"User-Agent": "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:79.0) Gecko/20100101 Firefox/79.0",
+                        "Accept-Language": "it,en-US;q=0.7,en;q=0.3",
+                         "Content-Type": "application/x-www-form-urlencoded",
+                         "X-Requested-With": "XMLHttpRequest",
+                         "Origin": "https://www.savelink.info",
+                         "Referer": "https://www.savelink.info/sites/mixcloud"}
+
+
 timeoutconnection = 120
 risorseaudioarray = []
 
@@ -106,38 +114,29 @@ def main():
 
     # Analizzo tutte le puntante pubblicate sul sito per individuarne di nuove
     urlmixcloud = "https://www.mixcloud.com/onedance/"
+    urlmixcloudrss = "https://rssbox.herokuapp.com/mixcloud/onedance/One%20Dance"
 
-    response = requests.get(urlmixcloud, headers=headerdesktop, timeout=timeoutconnection)
-    soup = BeautifulSoup(response.text, "html.parser")
+    feed = feedparser.parse(urlmixcloudrss)
 
-    for hgroup in soup.find_all("hgroup", attrs={"class": "card-title"}):
+    for post in feed.entries:
+        episodeLink = post.link
+        episodeLinkHash = hashlib.sha1(episodeLink.encode("ascii", "ignore")).hexdigest()
+        episodeTitle = post.title
+        episodeTitleLower = post.title.lower()
 
-        episodeAudio = ""
+        if episodeLinkHash not in episodesHash and "all you can dance" in episodeTitleLower:
 
-        for h1 in hgroup.find_all("h1"):
-            for link in h1.find_all("a", href=True):
+            # Ottengo l'URL della nuova risorsa audio
+            mixclouddownloader = "https://www.savelink.info/input"
+            data = {"url": episodeLink}
+            response = requests.post(mixclouddownloader, data=data, headers=headerdesktopsavelink, timeout=timeoutconnection)
 
-                episodeLink = "https://www.mixcloud.com%s" % link["href"]
-                episodeLinkHash = hashlib.sha1(episodeLink.encode("ascii", "ignore")).hexdigest()
-                episodeTitle = link.find("span").get("title")
-                episodeTitleLower = link.find("span").get("title").lower()
+            episodeAudio = response.json()["link"]
 
-                if episodeLinkHash not in episodesHash and "all you can dance" in episodeTitleLower:
-
-                    # Ottengo l'URL della nuova risorsa audio
-                    mixclouddownloader = "http://www.mixcloud-downloader.com/download/"
-                    data = {"url": episodeLink}
-                    response = requests.post(mixclouddownloader, data=data, headers=headerdesktop, timeout=timeoutconnection)
-                    soup = BeautifulSoup(response.text, "html.parser")
-
-                    for link in soup.find_all("a", href=True):
-                        if "mixcloud.com" in link["href"]:
-                            episodeAudio = link["href"]
-
-                    # Aggiungo alla lista la nuova puntanta
-                    if episodeAudio:
-                        episodeDate = pytz.utc.localize(datetime.datetime.utcnow())
-                        episodesList.insert(0, [episodeLinkHash, episodeTitle, episodeLink, episodeAudio, episodeDate])
+            # Aggiungo alla lista la nuova puntanta
+            if episodeAudio:
+                episodeDate = pytz.utc.localize(datetime.datetime.utcnow())
+                episodesList.insert(0, [episodeLinkHash, episodeTitle, episodeLink, episodeAudio, episodeDate])
 
     # Salvo la lista delle puntante
     save_analyzed_case(episodesList)
