@@ -1,34 +1,21 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # This file is part of RSS Generator Feed.
 #
-# Copyright(c) 2017 Andrea Draghetti
-# https://www.andreadraghetti.it
+# RSS Feed Generator was made with ♥ by Andrea Draghetti
 #
 # This file may be licensed under the terms of of the
 # GNU General Public License Version 3 (the ``GPL'').
 #
-# Software distributed under the License is distributed
-# on an ``AS IS'' basis, WITHOUT WARRANTY OF ANY KIND, either
-# express or implied. See the GPL for the specific language
-# governing rights and limitations.
-#
-# You should have received a copy of the GPL along with this
-# program. If not, go to http://www.gnu.org/licenses/gpl.html
-# or write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import os
-import json
 import Config
 import requests
-import feedparser
 from lxml import etree as ET
 from bs4 import BeautifulSoup
 from readability import Document
 from time import gmtime, strftime
 
-# User Agent MSIE 11.0 (Win 10)
-headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
-                 "Accept-Language": "it"}
+headerdesktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
+                 "Accept-Language": "it,en-US;q=0.7,en;q=0.3"}
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "certego.xml"
