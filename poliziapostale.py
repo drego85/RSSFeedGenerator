@@ -85,12 +85,12 @@ def scrap_poliziapostale(url):
     for link in soupdesktop.find_all("a", href=True):
         if "notizie/articolo/" in link["href"]:
             linkdef = link["href"].replace("?no_cache=1", "")
-            linkdef = "https://www.commissariatodips.it/" + linkdef
+            linkdef = "https://www.commissariatodips.it" + linkdef
             articoliList.append(linkdef)
 
 
 def main():
-    url = "http://www.commissariatodips.it/notizie.html"
+    url = "https://www.commissariatodips.it/notizie/index.html"
 
     # Acquisisco tutti gli URL degli articoli attraverso il modulo di ricerca di Repubblica
     scrap_poliziapostale(url)
