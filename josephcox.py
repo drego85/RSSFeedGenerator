@@ -81,8 +81,8 @@ def scrap_vice(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    for div in soupdesktop.find_all("div", attrs={"class": "pager-wrapper"}):
-        for link in div.find_all("a", href=True):
+    for div in soupdesktop.find_all("div", attrs={"class": "topic-page__cards"}):
+        for link in div.find_all("a", attrs={"class": "vice-card-hed__link"}, href=True):
             articoliList.append("https://www.vice.com" + link["href"])
 
 
