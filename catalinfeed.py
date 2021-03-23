@@ -19,7 +19,7 @@ headerdesktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "catalinfeed.xml"
-articoliList = []
+list_of_articles = []
 
 
 def make_feed():
@@ -35,7 +35,7 @@ def make_feed():
     link.text = "http://rss.draghetti.it"
 
     description = ET.SubElement(channel, "description")
-    description.text = "RSS feed of all articles written by Catalin Cimpanu for ZDNet"
+    description.text = "RSS feed of all articles written by Catalin Cimpanu"
 
     language = ET.SubElement(channel, "language")
     language.text = "en-EN"
@@ -77,27 +77,27 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
-def scrap_zdnet(url):
+def scrap_therecord(url):
     pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    for div in soupdesktop.find_all("div", attrs={"class": "content"}):
-        for link in div.find_all("a", attrs={"data-omniture-track": "moduleClick"}, href=True):
-            articoliList.append("https://www.zdnet.com" + link["href"])
+    for div in soupdesktop.find_all("div", attrs={"class": "papr-container-content"}):
+        for link in div.find_all("a", attrs={"class": "entry-title"}, href=True):
+            list_of_articles.append(link["href"])
 
 
 def main():
-    url = "https://www.zdnet.com/meet-the-team/us/catalin.cimpanu/"
+    url = "https://therecord.media/author/catalin-cimpanu/"
 
     # I get all the URLs of the articles written by the author
-    scrap_zdnet(url)
+    scrap_therecord(url)
 
     # If doesn't exist local XML file, I generate it
     if os.path.exists(rssfile) is not True:
         make_feed()
 
     # I analyze each articles found
-    for urlarticolo in articoliList:
+    for urlarticolo in list_of_articles:
         response = requests.get(urlarticolo, headers=headerdesktop, timeout=timeoutconnection)
 
         description = Document(response.text).summary()
