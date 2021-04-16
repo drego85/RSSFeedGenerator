@@ -15,12 +15,12 @@ from readability import Document
 from time import gmtime, strftime
 
 # User Agent MSIE 11.0 (Win 10)
-headerdesktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
+header_desktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
                  "Accept-Language": "it"}
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "lastampa.xml"
-articoliList = []
+list_of_articles = []
 
 
 def make_feed():
@@ -79,23 +79,23 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 
 
 def scrap_lastampa(url):
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+    pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     try:
-        articoliList.append(soupdesktop.find("article", attrs={"class": "entry__hybrid"}).find("h2", attrs={
+        list_of_articles.append(soupdesktop.find("article", attrs={"class": "entry__hybrid"}).find("h2", attrs={
             "class": "entry__title"}).find("a")["href"])
     except:
         pass
 
     try:
-        articoliList.append(soupdesktop.find("article", attrs={"class": "entry__large"}).find("h2", attrs={
+        list_of_articles.append(soupdesktop.find("article", attrs={"class": "entry__large"}).find("h2", attrs={
             "class": "entry__title"}).find("a")["href"])
     except:
         pass
 
     try:
-        articoliList.append(soupdesktop.find("article", attrs={"class": "entry__giant"}).find("h2", attrs={
+        list_of_articles.append(soupdesktop.find("article", attrs={"class": "entry__giant"}).find("h2", attrs={
             "class": "entry__title"}).find("a")["href"])
     except:
         pass
@@ -112,8 +112,8 @@ def main():
         make_feed()
 
     # Analizzo ogni singolo articolo rilevato
-    for urlarticolo in articoliList:
-        response = requests.get(urlarticolo, headers=headerdesktop, timeout=timeoutconnection)
+    for urlarticolo in list_of_articles:
+        response = requests.get(urlarticolo, headers=header_desktop, timeout=timeoutconnection)
 
         description = Document(response.text).summary()
         title = Document(response.text).short_title()

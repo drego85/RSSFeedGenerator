@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from readability import Document
 from time import gmtime, strftime
 
-headerdesktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
+header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
                  "Accept-Language": "it,en-US;q=0.7,en;q=0.3"}
 
 timeoutconnection = 120
@@ -78,7 +78,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 
 
 def scrap_homepage(url):
-    pagedesktop = requests.get(url, headers=headerdesktop, timeout=timeoutconnection)
+    pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     for ul in soupdesktop.find_all("ul", attrs={"class": "styles-module--posts--10uGs"}):
@@ -101,7 +101,7 @@ def main():
 
     # Analizzo ogni singolo articolo rilevato
     for article_link in list_of_articles:
-        response = requests.get(article_link, headers=headerdesktop, timeout=timeoutconnection)
+        response = requests.get(article_link, headers=header_desktop, timeout=timeoutconnection)
 
         description = Document(response.text).summary()
         title = Document(response.text).short_title()
