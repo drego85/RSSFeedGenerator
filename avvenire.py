@@ -82,7 +82,7 @@ def scrap_avvenire(url):
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
     for div in soupdesktop.find_all("div", attrs={"class": "sectionT1"}):
-        list_of_articles.append(div.find("div", attrs={"class": "box-cell"}).find("a")["href"])
+        list_of_articles.append("https://www.avvenire.it/" + div.find("div", attrs={"class": "box-cell"}).find("a")["href"])
 
 
 def main():
