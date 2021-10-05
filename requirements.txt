@@ -1,6 +1,6 @@
-bs4
 lxml
 podgen
 requests
 feedparser
+beautifulsoup4
 readability-lxml

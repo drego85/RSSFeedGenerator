@@ -15,7 +15,7 @@ from readability import Document
 from time import gmtime, strftime
 
 header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
-                 "Accept-Language": "it,en-US;q=0.7,en;q=0.3"}
+                  "Accept-Language": "it,en-US;q=0.7,en;q=0.3"}
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "catalinfeed.xml"
@@ -81,9 +81,10 @@ def scrap_therecord(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    for div in soupdesktop.find_all("div", attrs={"class": "papr-container-content"}):
-        for link in div.find_all("a", attrs={"class": "entry-title"}, href=True):
-            list_of_articles.append(link["href"])
+    for div in soupdesktop.find_all("div", attrs={"class": "details"}):
+        for link in div.find_all("a", href=True):
+            if link["href"] != "https://therecord.media/author/catalin-cimpanu/":
+                list_of_articles.append(link["href"])
 
 
 def main():
