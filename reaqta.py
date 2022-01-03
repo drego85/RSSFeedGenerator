@@ -81,11 +81,12 @@ def scrap_homepage(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    for ul in soupdesktop.find_all("ul", attrs={"class": "styles-module--posts--10uGs"}):
+    for ul in soupdesktop.find_all("ul", attrs={"class": "styles-module--cards--26a1_"}):
 
         for link in ul.find_all("a", href=True):
             if link["href"].startswith("/"):
                 article_link = "https://reaqta.com" + link["href"]
+
                 list_of_articles.append(article_link)
 
 
