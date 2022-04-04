@@ -22,8 +22,8 @@ timeoutconnection = 120
 rssfile = Config.outputpath + "breachedco.xml"
 list_of_articles = []
 
-list_of_excluede_articles = ["https://breached.co/archive/index.php/thread-847.html",
-                             "https://breached.co/archive/index.php/thread-262.html"]
+list_of_excluede_articles = ["https://breached.to/archive/index.php/thread-847.html",
+                             "https://breached.to/archive/index.php/thread-262.html"]
 
 
 def make_feed():
@@ -33,19 +33,19 @@ def make_feed():
     channel = ET.SubElement(root, "channel")
 
     title = ET.SubElement(channel, "title")
-    title.text = "Breached.co"
+    title.text = "Breached.to"
 
     link = ET.SubElement(channel, "link")
     link.text = "http://rss.draghetti.it"
 
     description = ET.SubElement(channel, "description")
-    description.text = "RSS feed dei Data Leak pubblicati su Breached.co"
+    description.text = "RSS feed dei Data Leak pubblicati su Breached.to"
 
     language = ET.SubElement(channel, "language")
     language.text = "it-IT"
 
     generator = ET.SubElement(channel, "generator")
-    generator.text = "Breached.co by Andrea Draghetti"
+    generator.text = "Breached.to by Andrea Draghetti"
 
     tree = ET.ElementTree(root)
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
@@ -97,8 +97,8 @@ def scrap_breachedco(url):
 
 
 def main():
-    list_of_urls = ["https://breached.co/archive/index.php/forum-7.html",
-                    "https://breached.co/archive/index.php/forum-24.html"]
+    list_of_urls = ["https://breached.to/archive/index.php/forum-7.html",
+                    "https://breached.to/archive/index.php/forum-24.html"]
 
     for url in list_of_urls:
         scrap_breachedco(url)
