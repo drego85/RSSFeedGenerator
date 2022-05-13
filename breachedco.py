@@ -22,8 +22,8 @@ timeoutconnection = 120
 rssfile = Config.outputpath + "breachedco.xml"
 list_of_articles = []
 
-list_of_excluede_articles = ["https://breached.to/archive/index.php/thread-847.html",
-                             "https://breached.to/archive/index.php/thread-262.html"]
+list_of_excluede_articles = ["https://breached.co/Thread-Database-Requests--847",
+                             "https://breached.co/Announcement-Database-Index"]
 
 
 def make_feed():
@@ -85,20 +85,19 @@ def scrap_breachedco(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    try:
-        for div in soupdesktop.find_all("div", attrs={"class": "threadlist"}):
-            for ol in div.find("ol").find_all("li"):
-                for link in ol.find_all("a", href=True):
-                    article_link = link["href"]
-                    if article_link not in list_of_excluede_articles:
-                        list_of_articles.append(article_link)
-    except:
-        pass
+    for table in soupdesktop.find_all("table", attrs={"class": "tborder clear"}):
+
+        for span in table.find_all("span", attrs={"class": "subject_new"}):
+            for link in span.find_all("a", href=True):
+
+                article_link = "https://breached.co/" + link["href"]
+                if article_link not in list_of_excluede_articles:
+                    list_of_articles.append(article_link)
 
 
 def main():
-    list_of_urls = ["https://breached.to/archive/index.php/forum-7.html",
-                    "https://breached.to/archive/index.php/forum-24.html"]
+    list_of_urls = ["https://breached.co/Forum-Databases",
+                    "https://breached.co/Forum-Official"]
 
     for url in list_of_urls:
         scrap_breachedco(url)
