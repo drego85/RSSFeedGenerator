@@ -14,9 +14,16 @@ from bs4 import BeautifulSoup
 from readability import Document
 from time import gmtime, strftime
 
-# User Agent MSIE 11.0 (Win 10)
-header_desktop = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MATBJS; rv:11.0) like Gecko",
-                  "Accept-Language": "it"}
+header_desktop = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0) Gecko/20100101 Firefox/100.0",
+    "Accept-Language": "it,en-US;q=0.7,en;q=0.3",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "DNT": "1",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Pragma": "no-cache",
+    "Cache-Control": "no-cache",
+    "TE": "trailers"}
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "breachedco.xml"
