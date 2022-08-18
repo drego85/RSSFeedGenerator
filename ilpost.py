@@ -88,7 +88,11 @@ def scrap_ilpost(url):
 
     for div in soupdesktop.find_all("div", attrs={"class": "entry-content"}):
         if article > 0:
-            list_of_articles.append(div.find("h2", attrs={"class": "entry-title"}).find("a")["href"])
+            article_url = div.find("h2", attrs={"class": "entry-title"}).find("a")["href"]
+            article_url = article_url.replace("?homepagePosition=0", "")
+            article_url = article_url.replace("?homepagePosition=1", "")
+            article_url = article_url.replace("?homepagePosition=2", "")
+            list_of_articles.append(article_url)
             article -= 1
 
 def main():
