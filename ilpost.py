@@ -86,13 +86,11 @@ def scrap_ilpost(url):
     # Ottengo i primi due articoli di rielivo
     article = 2
 
-    for div in soupdesktop.find_all("div", attrs={"class": ["index_col-apertura__IK1DC", "_article-content_1jdu8_20"]}):
+    for div in soupdesktop.find_all("div", attrs={"class": ["index_col-apertura__IK1DC", "_article-content_1jdu8_20", "_article-content_1n08y_20"]}):
         if article > 0:
             article_url = div.find("a")["href"]
-            article_url = article_url.replace("?homepagePosition=0", "")
-            article_url = article_url.replace("?homepagePosition=1", "")
-            article_url = article_url.replace("?homepagePosition=2", "")
-            print(article_url)
+            # remove any GET parameters
+            article_url = article_url.split("?")[0]
             list_of_articles.append(article_url)
             article -= 1
 
