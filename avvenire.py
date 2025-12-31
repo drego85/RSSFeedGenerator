@@ -19,8 +19,6 @@ header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; r
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "avvenire.xml"
-list_of_articles = []
-
 
 def make_feed():
     root = ET.Element("rss")
@@ -81,22 +79,28 @@ def scrap_avvenire(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    for div in soupdesktop.find_all("div", attrs={"class": "sectionT1"}):
-        list_of_articles.append("https://www.avvenire.it/" + div.find("div", attrs={"class": "box-cell"}).find("a")["href"])
+    article_links = []
+
+    for a in soupdesktop.select('a[data-role="title"][href]'):
+        title = a.get_text(strip=True)
+
+        article_links.append(a["href"])
+
+    return article_links
 
 
 def main():
     url = "https://www.avvenire.it/"
 
     # Acquisisco l'articolo principale
-    scrap_avvenire(url)
+    list_of_articles = scrap_avvenire(url)
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
         make_feed()
 
     # Analizzo ogni singolo articolo rilevato
-    for urlarticolo in list_of_articles:
+    for urlarticolo in list_of_articles[:3]:
         response = requests.get(urlarticolo, headers=header_desktop, timeout=timeoutconnection)
 
         description = Document(response.text).summary()
