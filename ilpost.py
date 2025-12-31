@@ -19,8 +19,6 @@ header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; r
 
 timeoutconnection = 120
 rssfile = Config.outputpath + "ilpost.xml"
-list_of_articles = []
-
 
 def make_feed():
     root = ET.Element("rss")
@@ -81,24 +79,33 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 
 def scrap_ilpost(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
-    soupdesktop = BeautifulSoup(pagedesktop.text, "html.parser")
+    soup = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    # Ottengo i primi due articoli di rielivo
-    article = 2
+    h1 = soup.select_one("h1._article-title_vvjfb_7")
+    h2_list = soup.select("h2._article-title_vvjfb_7")[:3]  # <-- SOLO I PRIMI
 
-    for div in soupdesktop.find_all("div", attrs={"class": ["index_col-apertura__IK1DC", "_article-content_1jdu8_20", "_article-content_1n08y_20"]}):
-        if article > 0:
-            article_url = div.find("a")["href"]
-            # remove any GET parameters
-            article_url = article_url.split("?")[0]
-            list_of_articles.append(article_url)
-            article -= 1
+    article_list = []
+    article_links = []
+
+    if h1:
+        article_list.append(h1)
+
+    article_list.extend(h2_list)
+
+    for article in article_list:
+        a = article.find_parent("a")
+        article_url = a['href']
+        article_url = article_url.split("?")[0]
+        article_links.append(article_url)
+
+    return article_links
 
 def main():
     url = "https://www.ilpost.it/"
 
     # Acquisisco l'articolo principale
-    scrap_ilpost(url)
+    list_of_articles = scrap_ilpost(url)
+
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
