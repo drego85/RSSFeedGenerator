@@ -50,12 +50,18 @@ def make_feed():
 def add_feed(titlefeed, descriptionfeed, linkfeed):
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.parse(rssfile, parser)
-    channel = tree.getroot()
+    root = tree.getroot()
+    channel = root.find("channel")
 
     # Escludo eventuali duplicati in base al link
     for i in channel.findall(".//link"):
         if (i.text == linkfeed):
             return
+
+    # Mantieni al massimo 20 item: se già presenti, elimina il più vecchio
+    items = channel.findall("item")
+    if len(items) >= 20:
+        channel.remove(items[-1])
 
     item = ET.SubElement(channel, "item")
 
@@ -73,7 +79,7 @@ def add_feed(titlefeed, descriptionfeed, linkfeed):
 
     channel.find(".//generator").addnext(item)
 
-    tree = ET.ElementTree(channel)
+    tree = ET.ElementTree(root)
     tree.write(rssfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")
 
 
