@@ -13,6 +13,7 @@ from lxml import etree as ET
 from bs4 import BeautifulSoup
 from readability import Document
 from time import gmtime, strftime
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
 header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
                  "Accept-Language": "it,en-US;q=0.7,en;q=0.3"}
@@ -20,11 +21,27 @@ header_desktop = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; r
 timeoutconnection = 120
 rssfile = Config.outputpath + "ilpost.xml"
 
+
+def normalize_article_url(url):
+    parsed = urlparse(url)
+    query_params = parse_qs(parsed.query, keep_blank_values=True)
+    query_params.pop("homepagePosition", None)
+    normalized_query = urlencode(query_params, doseq=True)
+
+    return urlunparse(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            normalized_query,
+            "",
+        )
+    )
+
 def make_feed():
     root = ET.Element("rss")
     root.set("version", "2.0")
-
-    
 
     channel = ET.SubElement(root, "channel")
 
@@ -48,6 +65,8 @@ def make_feed():
 
 
 def add_feed(titlefeed, descriptionfeed, linkfeed):
+    linkfeed = normalize_article_url(linkfeed)
+
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.parse(rssfile, parser)
     root = tree.getroot()
@@ -87,24 +106,30 @@ def scrap_ilpost(url):
     pagedesktop = requests.get(url, headers=header_desktop, timeout=timeoutconnection)
     soup = BeautifulSoup(pagedesktop.text, "html.parser")
 
-    h1 = soup.select_one("h1._article-title_vvjfb_7")
-    h2_list = soup.select("h2._article-title_vvjfb_7")[:3]  # <-- SOLO I PRIMI
+    article_by_position = {}
 
-    article_list = []
-    article_links = []
+    for anchor in soup.select('a[href*="homepagePosition="]'):
+        href = anchor.get("href")
+        if not href:
+            continue
 
-    if h1:
-        article_list.append(h1)
+        absolute_url = urljoin(url, href)
+        parsed_url = urlparse(absolute_url)
+        homepage_position = parse_qs(parsed_url.query).get("homepagePosition", [None])[0]
 
-    article_list.extend(h2_list)
+        if homepage_position is None or not homepage_position.isdigit():
+            continue
 
-    for article in article_list:
-        a = article.find_parent("a")
-        article_url = a['href']
-        article_url = article_url.split("?")[0]
-        article_links.append(article_url)
+        if parsed_url.path.startswith("/episodes/"):
+            continue
 
-    return article_links
+        if homepage_position not in article_by_position:
+            article_by_position[homepage_position] = normalize_article_url(absolute_url)
+
+    return [
+        article_by_position[position]
+        for position in sorted(article_by_position, key=int)[:4]
+    ]
 
 def main():
     url = "https://www.ilpost.it/"
@@ -112,6 +137,7 @@ def main():
     # Acquisisco l'articolo principale
     list_of_articles = scrap_ilpost(url)
 
+    print(list_of_articles)
 
     # Se non esiste localmente un file XML procedo a crearlo.
     if os.path.exists(rssfile) is not True:
