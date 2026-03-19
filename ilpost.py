@@ -123,6 +123,9 @@ def scrap_ilpost(url):
         if parsed_url.path.startswith("/episodes/"):
             continue
 
+        if parsed_url.path.startswith("/newsletter/"):
+            continue
+            
         if homepage_position not in article_by_position:
             article_by_position[homepage_position] = normalize_article_url(absolute_url)
 
